@@ -10,14 +10,10 @@
 			if($xml_source){
 				$parser = new MiniXMLDoc();
 				$parser->fromString($xml_source);
-				$root =& $parser->getRoot();
-				if($errors_node =& $root->getElement('Errors')){
+				if($errors_node = $parser->getRoot()->getElement('Errors')){
 					self::$has_errors = true;
-					$error_node =& $errors_node->getAllChildren('Error');
-					foreach($error_node as $error)
-						$code =& $error->getElement('Code');
-						$message =& $error->getElement('Message');
-						self::$errors[] = array('code' => $code->getValue(), 'message' => $message->getValue());
+					foreach($errors_node->getAllChildren('Error') as $error_node)
+						self::$errors[] = array('code' => $error_node->getElement('Code')->getValue(), 'message' => $error_node->getElement('Message')->getValue());
 					return true;
 				}
 			}
@@ -29,16 +25,16 @@
 			else {
 				$parser = new MiniXMLDoc();
 				$parser->fromString($xml_source);
-				$root = $parser->getRoot();
 				$items = array();
-				foreach($root->getElement('SellerListings')->getAllChildren('SellerListing') as $minixml_item){
+				foreach($parser->getRoot()->getElement('SellerListings')->getAllChildren('SellerListing') as $minixml_item){
 					$item = array();
 					foreach($minixml_item->getAllChildren() as $minixml_attribute){
-						if($minixml_attribute->xnumChildren <= 1) $item[] = array($minixml_attribute->xname => $minixml_attribute->getValue());
-						else foreach($minixml_attribute->getAllChildren() as $sub_attribute) $item[] = array($sub_attribute->xname, $sub_attribute->getValue());
+						if($minixml_attribute->xnumChildren <= 1) $item[$minixml_attribute->xname] = $minixml_attribute->getValue();
+						else foreach($minixml_attribute->getAllChildren() as $sub_attribute) $item[$sub_attribute->xname] = $sub_attribute->getValue();
 					}
 					$items[] = $item;
 				}
+				return $items;
 			}
 		}
 	}

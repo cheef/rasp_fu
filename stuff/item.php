@@ -50,6 +50,10 @@
 			self::$current = $this;
 		}
 
+		public static function create(){
+			return new RaspItemsCollection;
+		}
+
 		public function add($item){
 			$this->items[] = $item;
 			$this->last = &$this->items[count($this->items) - 1];
@@ -60,6 +64,10 @@
 			$returning = true;
 			foreach($this->items as $item) $returning = $returning && $item->save($db_object);
 			return $returning;
+		}
+
+		public function size(){
+			return count($this->items);
 		}
 	}
 ?>

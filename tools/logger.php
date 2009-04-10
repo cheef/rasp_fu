@@ -20,6 +20,8 @@
 		}
 
 		public static function save($message){
+			if(!self::$options['silence']) print $message;
+
 			self::$current->open();
 			$returning = self::$current->file->write($message);
 			self::$current->close();
