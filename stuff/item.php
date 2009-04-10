@@ -8,7 +8,13 @@
 
 		public static $table_name = 'items';
 		public $attributes = array();
-		public $fields = array('formatted_price' => 'formated_amount');
+		public $fields = array(
+			'formatted_price' => 'formated_amount',
+			'total_new' => 'new_count',
+			'total_used' => 'used_count',
+			'total_collectible' => 'collectible_count',
+			'total_refurbished' => 'refurbished_count'
+		);
 
 		public function RaspItem($params = array()){
 			foreach($params as $attribute => $value) $this->set($attribute, $value);
@@ -20,12 +26,35 @@
 		}
 
 		public function save($db_object){
+			if(isset($this->attributes['id']) && !empty($this->attributes['id'])) return $this->update($db_object);
+			else return $this->insert($db_object);
+		}
+
+		public function insert($db_object){
 			return $db_object->query('INSERT INTO ' . self::$table_name . '(' . join(',', self::escape($this->attributes(), $db_object, '`')) . ') VALUES (' . join(',', self::escape($this->values(), $db_object)) . ');');
 		}
 
-		public static function escape($array, $db_object, $escaper = "'"){
-			foreach($array as $key => $element)	$array[$key]  = $escaper . $db_object->escape($element) . $escaper;
-			return $array;
+		public function update($db_object){
+			$strings_for_update = array();
+			foreach($this->attributes as $field => $value)
+				$strings_for_update[] = self::escape($field, $db_object, '`') . ' = ' . self::escape($value, $db_object);
+			return $db_object->query('UPDATE ' . self::$table_name . ' SET ' . join(',', $strings_for_update) . ' WHERE `id` = ' . $this->attributes['id']);
+		}
+
+		public function merge($params){
+			foreach($params as $attribute => $value)
+				$this->set((in_array(RaspString::underscore($attribute), RaspArray::keys($this->fields)) ? $this->fields[RaspString::underscore($attribute)] : $attribute), $value);
+		}
+
+		public function find_all($db_object, $conditions = null){
+			return $db_object->find('all', array('table_name' => self::$table_name, 'conditions' => $conditions));
+		}
+
+		public static function escape($target, $db_object, $escaper = "'"){
+			if(is_array($target))
+				foreach($target as $key => $element) $target[$key]  = $escaper . $db_object->escape($element) . $escaper;
+			else $target = $escaper . $db_object->escape($target) . $escaper;
+			return $target;
 		}
 
 		public function attributes(){
