@@ -5,13 +5,15 @@
 
 	class RaspHttpResponse extends RaspAbstractTool {
 
-		public $response, $body, $header;
+		public $response, $body, $header, $info, $status;
 		public static $current = null;
 
 		public function RaspHttpResponse($response_body, $options = array()){
 			$this->response = $response_body;
-			$this->body = trim(substr($response_body, $options['header_size']));
-			$this->header = $this->extract_header(substr($response_body, 0, $options['header_size']));
+			$this->info = $options['info'];
+			$this->status = $this->info['http_code'];
+			$this->body = trim(substr($response_body, $this->info['header_size']));
+			$this->header = $this->extract_header(substr($response_body, 0, $this->info['header_size']));
 		}
 
 		public static function create($options){
