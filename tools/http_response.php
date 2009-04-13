@@ -16,18 +16,16 @@
 			$this->header = $this->extract_header(substr($response_body, 0, $this->info['header_size']));
 		}
 
+		public function is_success(){
+			return $this->status == 200;
+		}
+
 		public static function create($options){
 			return (self::$current = new RaspHttpResponse(RaspArray::delete($options, 'source'), $options));
 		}
 
 		private function extract_header($response_body){
 			return RaspHttpHeader::create($response_body)->to_a();
-		}
-
-		public function __destruct(){
-			$this->response = null;
-			$this->body = null;
-			$this->header = null;
 		}
 	}
 ?>

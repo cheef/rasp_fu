@@ -7,24 +7,37 @@
 	class RaspHttpRequester extends RaspAbstractService {
 		public static $default_requester_options = array('port' => 80);
 		public $handler;
+		private $options = array();
 
 		public function RaspHttpRequester($options = array()){
 			$request_options = array_merge(self::$default_requester_options, $options);
 			$this->handler = curl_init();
-			curl_setopt($this->handler, CURLOPT_PORT, $request_options['port']);
-			curl_setopt($this->handler, CURLOPT_RETURNTRANSFER, true);
-			curl_setopt($this->handler, CURLOPT_HEADER, true);
+
+			$this->set(array(
+				CURLOPT_PORT => $request_options['port'],
+				CURLOPT_RETURNTRANSFER => true,
+				CURLOPT_HEADER => true
+			));
+
 			if(RaspArray::index($request_options, 'post', false)){
-				curl_setopt($this->handler, CURLOPT_POST, 1);
-				if(RaspArray::index($request_options, 'data', false)) curl_setopt($this->handler, CURLOPT_POSTFIELDS, $request_options['data']);
+				$this->set(array(CURLOPT_POST => 1));
+				if(RaspArray::index($request_options, 'data', false)) $this->set(array(CURLOPT_POSTFIELDS => $request_options['data']));
 			}
-			if(RaspArray::index($request_options, 'cookies', false)) curl_setopt($this->handler, CURLOPT_COOKIE, $request_options['cookies']);
+			if(RaspArray::index($request_options, 'cookies', false)) $this->set(array(CURLOPT_COOKIE => $request_options['cookies']));
 		}
 
 		public function send($url){
-			curl_setopt($this->handler, CURLOPT_URL, $url);
-			$this->response_body = curl_exec($this->handler);
-			return RaspHttpResponse::create(array('source' => $this->response_body, 'info' => curl_getinfo($this->handler)));
+			$this->set(array(CURLOPT_URL => $url));
+			return RaspHttpResponse::create(array('source' => $this->request(), 'info' => curl_getinfo($this->handler)));
+		}
+
+		private function request(){
+			curl_setopt_array($this->handler, $this->options);
+			return curl_exec($this->handler);
+		}
+
+		public function set($options){
+			return $this->options = $this->options + $options;
 		}
 
 		public function close(){
