@@ -15,7 +15,7 @@
 		}
 
 		public function size($forcing = false){
-			return (($forcing || empty($this->size)) ? count($this->data) : $this->size);
+			return (($forcing || empty($this->size)) ? $this->size = count($this->data) : $this->size);
 		}
 
 		public function add($element){
