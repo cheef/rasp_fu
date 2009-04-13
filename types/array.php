@@ -17,15 +17,15 @@
 		 * @return mixed $element(or $key)  value of first element of input array (or it's key if $returnKey is true)
 		 * @param array $array
 		 */
-		public  static function first($array, $return_key = false){
-			foreach($array as $key => $element) return ($return_key ?  $key : $element);
+		public static function first($array, $return_key = false){
+			foreach($array as $key => $element) return ($return_key ?  $key : $array[$key]);
 		}
 
 		/**
 		 * @return mixed $element(or $key)  value of second element of input array (or it's key if $returnKey is true)
 		 * @param array $array
 		 */
-		function second($array, $return_key = false){
+		public static function second($array, $return_key = false){
 			$counter = 1;
 			foreach($array as $key => $element){
 				if($counter == 2) return ($return_key ?  $key : $element);
@@ -39,12 +39,10 @@
 		 * @param array $array
 		 * @param bool $returnKey[optional]
 		 */
-		public static function last($array, $returnKey = false){
-			$counter = 0;
+		public static function last($array, $return_key = false){
+			$counter = 1;
 			foreach($array as $key => $element){
-				if($counter == count($array) - 1)
-					if ($returnKey) return $key;
-					else return $element;
+				if($counter == count($array)) return ($return_key ? $key : $element);
 				$counter++;
 			}
 		}
