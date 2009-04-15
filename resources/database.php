@@ -32,8 +32,12 @@
 			return self::$current = new RaspDatabase($options);
 		}
 
-		public function fetch($query){
-			return mysql_fetch_assoc($query, $this->handler);
+		public function fetch($reponse_resource){
+			return mysql_fetch_assoc($reponse_resource);
+		}
+
+		public function close(){
+			return mysql_close($this->handler);
 		}
 	}
 
