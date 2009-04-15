@@ -8,7 +8,7 @@
 
 		public static $db = null;
 		public static $connection_params = array();
-		public static $table_name, $class_name = 'RaspActiveRecord';
+		public static $table_name, $class_name = __CLASS__;
 		public static $database_driver = 'RaspDatabase';
 		public $attributes;
 
