@@ -16,12 +16,11 @@
 		}
 
 		public static function pluralize($string){
-			return (self::is_exception(self::last($string)) ? substr($string , 0, count($string) - 2) . 'i' : $string) . (self::is_vowel(self::last($string)) ? 'es' : 's');
+			return (self::is_exception(self::last($string)) ? substr($string , 0, count($string) - 2) . 'i' : $string) . self::make_closure($string);
 		}
 
 		public static function tableize($string){
-			$string = self::underscore($string);
-			return self::pluralize($string);
+			return self::pluralize(self::underscore($string));
 		}
 
 		public static function last($string){
@@ -30,6 +29,10 @@
 
 		private static function is_vowel($symbol){
 			return in_array($symbol, self::$vowels);
+		}
+
+		private static function make_closure($string){
+			return (self::is_vowel(self::last($string)) ? 'es' : 's');
 		}
 
 		public static function is_exception($symbol){
