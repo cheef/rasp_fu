@@ -32,5 +32,9 @@
 		public function is_eof(){
 			return feof($this->handler);
 		}
+
+		public static function create($options){
+			return new RaspFile($options);
+		}
 	}
 ?>
