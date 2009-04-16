@@ -1,5 +1,5 @@
 <?php
-	class RaspRequestBuilder {
+	class RaspRequestBuilderDeprecated {
 
 		private static $br = "\r\n", $boundary = '';
 

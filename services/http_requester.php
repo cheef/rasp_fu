@@ -2,6 +2,7 @@
 
 	require_once RASP_SERVICES_PATH . 'abstract_service.php';
 	require_once RASP_TOOLS_PATH . 'http_response.php';
+	require_once RASP_TOOLS_PATH . 'http_header.php';
 	require_once RASP_TYPES_PATH . 'array.php';
 
 	class RaspHttpRequester extends RaspAbstractService {
@@ -18,6 +19,9 @@
 				CURLOPT_RETURNTRANSFER => true,
 				CURLOPT_HEADER => true
 			));
+
+			if(RaspArray::index($request_options, 'headers', false))
+				$this->set(array(CURLOPT_HTTPHEADER => RaspHttpHeader::create(array('attributes' => $request_options['headers']))->to_curl_strings()));
 
 			if(RaspArray::index($request_options, 'post', false)){
 				$this->set(array(CURLOPT_POST => 1));

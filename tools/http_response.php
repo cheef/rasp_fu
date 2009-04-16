@@ -25,7 +25,7 @@
 		}
 
 		private function extract_header($response_body){
-			return RaspHttpHeader::create($response_body)->to_a();
+			return RaspHttpHeader::create(array('source' => $response_body))->to_a();
 		}
 	}
 ?>
