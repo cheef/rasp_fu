@@ -1,0 +1,345 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>5.2. コードを書く前に、まずは要求される振る舞いを定義する</title>
+    <link rel="stylesheet" href="style.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="PHPSpec リファレンスマニュアル" />
+    <link rel="up" href="writing.specs.with.phpspec.html" title="第5章 PHPSpec でのスペックの記述" />
+    <link rel="prev" href="writing.specs.with.phpspec.html" title="第5章 PHPSpec でのスペックの記述" />
+    <link rel="next" href="spec.domain.specific.language.html" title="5.3. スペック用のドメイン特化言語 (DSL)" />
+    <link rel="preface" href="preface.html" title="序文" />
+    <link rel="chapter" href="installing.phpspec.html" title="第1章 PHPSpec のインストール" />
+    <link rel="chapter" href="getting.started.html" title="第2章 さぁはじめましょう" />
+    <link rel="chapter" href="introduction.html" title="第3章 導入" />
+    <link rel="chapter" href="phpspecs.goals.html" title="第4章 PHPSpec の目標" />
+    <link rel="chapter" href="writing.specs.with.phpspec.html" title="第5章 PHPSpec でのスペックの記述" />
+    <link rel="chapter" href="execution.methods.for.phpspec.html" title="第6章 PHPSpec の実行方法" />
+    <link rel="appendix" href="copyrights.html" title="付録 A. 著作権について" />
+    <link rel="index" href="the.index.html" title="目次" />
+    <link rel="subsection" href="before.writing.code.specify.its.required.behaviour.html#explaining.the.phpspec.spec.layout" title="5.2.1. PHPSpec におけるスペックの配置" />
+    <link rel="subsection" href="before.writing.code.specify.its.required.behaviour.html#the.code.to.implement.the.new.filesystem.logger.specification" title="5.2.2. New Filesystem Logger の仕様を実装するコード" />
+  </head>
+  <body>
+    <div class="navheader">
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">5.2. コードを書く前に、まずは要求される振る舞いを定義する</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="writing.specs.with.phpspec.html">前のページ</a> </td>
+          <th width="60%" align="center">第5章 PHPSpec でのスペックの記述</th>
+          <td width="20%" align="right"> <a accesskey="n" href="spec.domain.specific.language.html">次のページ</a></td>
+        </tr>
+      </table>
+    </div>
+    <div class="section" lang="ja" xml:lang="ja">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="before.writing.code.specify.its.required.behaviour"></a>5.2. コードを書く前に、まずは要求される振る舞いを定義する</h2>
+          </div>
+        </div>
+      </div>
+      <p>
+      新しいアプリケーションを開発するにあたり、監査証跡を記録するロギングシステム
+      <a id="id2332361" class="indexterm"></a>
+      が必要となりました。
+      既存のオープンソースのロガーライブラリを調べてみたところ、
+      要件を満たすライブラリが見つからないようです。
+      そこで要件を満たすライブラリを自前で作成することにしました。
+      実際に作成しはじめる前に、まずその要件をはっきりさせなければなりません。
+      言いかえれば、そのライブラリがどのように振る舞ってほしいのかをはっきりさせるということです。
+      他のメンバーと相談した結果、まず最低限の基本機能が確定しました。
+      それは、メッセージをファイルシステムに記録するということです。
+    </p>
+      <p>
+      さっさとエディタを立ち上げてコードを書きはじめたい気持ちはわかりますが、
+      まずは仕様
+      <a id="id2333456" class="indexterm"></a>
+      を書くことからはじめましょう。
+    </p>
+      <div class="example">
+        <a id="id1295768"></a>
+        <p class="title">
+          <b>例 5.2. プレーンテキストで書いた、ファイルシステムロガーのスペック</b>
+        </p>
+        <div class="example-contents">
+          <pre class="screen">New Filesystem Logger:
+(新しいファイルシステムロガー)
+- should create a new log file if none currently exists
+  (は、ログファイルが存在しない場合は新規ファイルを作成しなければならない)
+- should use an existing log file if one exists without truncating it
+  (は、ログファイルが存在する場合は、既存の内容を残したままそのファイルを使用しなければならない)
+- should throw Exception if existing log file not writeable
+  (は、ログファイルに書き込めない場合には例外をスローしなければならない)</pre>
+        </div>
+      </div>
+      <br class="example-break" />
+      <p>
+      このシンプルなプレーンテキストの仕様を PHPSpec 形式に変換するには、
+      新しいコンテキストクラスを作成して
+      その振る舞いを表すサンプルを定義します。
+    </p>
+      <pre class="programlisting">class DescribeNewFilesystemLogger extends PHPSpec_Context
+{
+
+    public function itShouldCreateCreateNewLogFileIfNoneExists()
+    {
+        $this-&gt;pending();
+    }
+
+    public function itShouldUseAnExistingLogFileIfOneExistsWithoutTruncatingIt()
+    {
+        $this-&gt;pending();
+    }
+
+    public function itShouldThrowExceptionIfExistingLogFileNotWriteable()
+    {
+        $this-&gt;pending();
+    }
+
+}</pre>
+      <p>
+      この雛形クラスでは、未確定の (pending)
+      <a id="id570161" class="indexterm"></a>
+      サンプルが定義されています。
+      未確定とは、まだ完成していないなどの状態を意味します。
+      このスペックを NewFilesystemLoggerSpec.php というファイル
+      (もうひとつのファイル命名規約を用います。先頭の "Describe"
+      を省略して最後に "Spec" を付加します)
+      に保存してコマンドラインから実行すると、その出力は次のようになります。
+    </p>
+      <pre class="screen">PPP
+
+Finished in 0.0468921661377 seconds
+
+3 examples, 0 failures, 3 pending</pre>
+      <p>
+      PHPSpec を実行する際のコマンドラインは次のようになります。
+    </p>
+      <pre class="screen">phpspec NewFileSystemLoggerSpec</pre>
+      <p>
+      先ほど定義した仕様にもとづいて、
+      これらのサンプルメソッドの中身を作成していきましょう。
+    </p>
+      <div class="example">
+        <a id="id2335467"></a>
+        <p class="title">
+          <b>例 5.3. New Filesystem Logger コンテキストの仕様</b>
+        </p>
+        <div class="example-contents">
+          <pre class="programlisting">class DescribeNewFilesystemLogger extends PHPSpec_Context
+{
+
+    public function itShouldCreateCreateNewLogFileIfNoneExists()
+    {
+        $file = $this-&gt;getTmpFileName();
+        $logger = new Logger($file);
+        $this-&gt;spec(file_exists($file))-&gt;should-&gt;beTrue();
+    }
+
+    public function itShouldUseAnExistingLogFileIfOneExistsWithoutTruncatingIt()
+    {
+        $file = $this-&gt;getTmpFileName();
+        file_put_contents($file, 'Hello' . "\n");
+        $logger = new Logger($file);
+        $this-&gt;spec(file_get_contents($file))-&gt;shouldNot-&gt;beEmpty();
+    }
+
+    public function itShouldThrowExceptionIfExistingLogFileNotWriteable()
+    {
+        $file = $this-&gt;getTmpFileName();
+        file_put_contents($file, 'Hello' . "\n");
+        $this-&gt;spec('Logger', $file)-&gt;should-&gt;throw('Exception');
+    }
+
+    public function after()
+    {
+        unlink($this-&gt;getTmpFileName());
+    }
+
+    public function getTmpFileName()
+    {
+        return sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'logger_tmp_file.log';
+    }
+
+}</pre>
+        </div>
+      </div>
+      <br class="example-break" />
+      <p>
+      これで、最初にプレーンテキストで定義したスペックを実行可能なコードサンプルに落とすことができました。
+      もちろん、今これを実行しても単に Fatal Error となるだけでしょう。
+      まだ Logger クラスが存在しないわけですから。
+      この続きは、また後ほど。
+    </p>
+      <div class="section" lang="ja" xml:lang="ja">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="explaining.the.phpspec.spec.layout"></a>5.2.1. PHPSpec におけるスペックの配置</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+        先ほど作成した新しいファイルシステムロガーのサンプルを見れば、スペック
+        <a id="id2345370" class="indexterm"></a>
+        をどのように作成すればいいのかがわかります。
+      </p>
+        <div class="orderedlist">
+          <ol type="1">
+            <li>
+              <p>
+            すべてのスペックは PHPSpec_Context のサブクラスに記述し、
+            システムの仕様を表す条件をここに集約する
+          </p>
+            </li>
+            <li>
+              <p>
+            コンテキストクラス名の最初は必ず "Describe" となり、
+            その後に内容を表す文を続ける
+          </p>
+            </li>
+            <li>
+              <p>
+            コンテキスト内のサンプルメソッド名の最初は必ず "itShould" となり、
+            その仕様を表す説明文をできるだけきちんとした文で書くようにする
+            (現在形で仕様を書くために、"Should"
+            を省略できるようにする可能性もある)
+          </p>
+            </li>
+            <li>
+              <p>
+            <code class="classname">PHPSpec_Context::spec()</code> メソッドを使用して、
+            DSL 経由で使用するオブジェクトやスカラー値を準備する
+          </p>
+            </li>
+            <li>
+              <p>
+            ドメイン特化言語 (DSL) は一般的に Expectation (should/shouldNot)
+            と Matcher (beSomething, haveSomething, equals, etc.) で構成される
+          </p>
+            </li>
+            <li>
+              <p>
+            正式なルールではないが、ひとつのサンプルではひとつのスペックのみを扱うようにする -
+            これにより、各スペックが個別の振る舞いを表すようになる
+          </p>
+            </li>
+            <li>
+              <p>
+            <code class="classname">getTmpFileName()</code>
+            のように、サンプル以外のメソッドをクラスに追加して
+            ヘルパーメソッドとして使用できる
+          </p>
+            </li>
+            <li>
+              <p>
+            <code class="classname">after()</code> メソッドおよび
+            <code class="classname">before()</code> メソッドを使用して、
+            各サンプルで共通のフィクスチャを準備できる
+          </p>
+            </li>
+            <li>
+              <p>
+            <code class="classname">afterAll()</code> メソッドおよび
+            <code class="classname">beforeAll()</code> メソッドを使用して、
+            全サンプルの実行の前後に一度だけ実行する処理を定義できる
+          </p>
+            </li>
+            <li>
+              <p>
+            サンプルの内部で例外やエラーを発生させても、
+            それがその他のテストの実行を妨げることはない
+          </p>
+            </li>
+          </ol>
+        </div>
+      </div>
+      <div class="section" lang="ja" xml:lang="ja">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="the.code.to.implement.the.new.filesystem.logger.specification"></a>5.2.2. New Filesystem Logger の仕様を実装するコード</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+        PHPSpec で書いた仕様をもとに、
+        その仕様を満たすロガーの実装を始めましょう。
+        きっとリファクタリングのことを考える人もおられるのでしょうが、
+        ここではまず、仕様を満たす必要最小限のコードを書くことだけを考えます。
+      </p>
+        <div class="example">
+          <a id="id2330069"></a>
+          <p class="title">
+            <b>例 5.4. ファイルシステムロガーの実装</b>
+          </p>
+          <div class="example-contents">
+            <pre class="programlisting">class Logger
+{
+
+    protected $_file = null;
+
+    public function __construct($file)
+    {
+        if (!file_exists($file)) {
+            $f = fopen($file, 'w');
+            fclose($f);
+        } elseif (file_exists($file) &amp;&amp; is_writeable($file)) {
+            $this-&gt;_file = $file;
+        } else {
+            throw new Exception('ログファイルに書き込めません'); 
+        }
+    }
+
+}</pre>
+          </div>
+        </div>
+        <br class="example-break" />
+        <p>
+        次に、これら以外にどんな振る舞いがあるのかを考えて
+        それを表すスペックを書いていきましょう。
+        Exception クラスを継承した Logger_Exception クラスを作成しますか?
+        ファイルのチェックをもう少し厳しくしますか?
+        ファイルの処理を新たなサブクラスに移したり、
+        あるいはストラテジークラスを使用したりしますか?
+      </p>
+        <p>
+        何をやるにしても、コードを書き始める前にまずスペックを書くようにします。
+        小さなことからコツコツと進め、少しずつクラスを作成していくようにしましょう。
+        また、仕様以上のことをコードに書かないよう心がけましょう。
+        ファイル処理を別のクラスに抽出することにしたとしても、
+        (その価値が十分あると保証できる場合を除いて)
+        すぐに新しいクラスの仕様を考えることはありません。というのも、
+        もとのスペックにおいても
+        ロガーを作成する際にファイルを指定するということが網羅されているからです。
+        この場合は新たな振る舞いを追加するのではなく、
+        単にその振る舞いに関する実装を透過的に変更するということになります。
+      </p>
+      </div>
+    </div>
+    <div class="navfooter">
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="writing.specs.with.phpspec.html">前のページ</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="writing.specs.with.phpspec.html">上に戻る</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="spec.domain.specific.language.html">次のページ</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">第5章 PHPSpec でのスペックの記述 </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">ホーム</a>
+          </td>
+          <td width="40%" align="right" valign="top"> 5.3. スペック用のドメイン特化言語 (DSL)</td>
+        </tr>
+      </table>
+    </div>
+    <div xmlns="" class="revinfo"></div>
+  </body>
+</html>

@@ -1,0 +1,565 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+  <html xmlns="http://www.w3.org/1999/xhtml">
+		<head>
+			<!-- template designed by Marco Von Ballmoos  -->
+			<title></title>
+			<link rel="stylesheet" href="media/stylesheet.css" />
+						<script src="media/lib/classTree.js"></script>
+									<meta http-equiv='Content-Type' content='text/html; charset=iso-8859-1'/>
+									<script language="javascript" type="text/javascript">
+				var imgPlus = new Image();
+				var imgMinus = new Image();
+				imgPlus.src = "media/images/plus.png";
+				imgMinus.src = "media/images/minus.png";
+				
+				function showNode(Node){
+							switch(navigator.family){
+								case 'nn4':
+									// Nav 4.x code fork...
+							var oTable = document.layers["span" + Node];
+							var oImg = document.layers["img" + Node];
+									break;
+								case 'ie4':
+									// IE 4/5 code fork...
+							var oTable = document.all["span" + Node];
+							var oImg = document.all["img" + Node];
+									break;
+								case 'gecko':
+									// Standards Compliant code fork...
+							var oTable = document.getElementById("span" + Node);
+							var oImg = document.getElementById("img" + Node);
+									break;
+							}
+					oImg.src = imgMinus.src;
+					oTable.style.display = "block";
+				}
+				
+				function hideNode(Node){
+							switch(navigator.family){
+								case 'nn4':
+									// Nav 4.x code fork...
+							var oTable = document.layers["span" + Node];
+							var oImg = document.layers["img" + Node];
+									break;
+								case 'ie4':
+									// IE 4/5 code fork...
+							var oTable = document.all["span" + Node];
+							var oImg = document.all["img" + Node];
+									break;
+								case 'gecko':
+									// Standards Compliant code fork...
+							var oTable = document.getElementById("span" + Node);
+							var oImg = document.getElementById("img" + Node);
+									break;
+							}
+					oImg.src = imgPlus.src;
+					oTable.style.display = "none";
+				}
+				
+				function nodeIsVisible(Node){
+							switch(navigator.family){
+								case 'nn4':
+									// Nav 4.x code fork...
+							var oTable = document.layers["span" + Node];
+									break;
+								case 'ie4':
+									// IE 4/5 code fork...
+							var oTable = document.all["span" + Node];
+									break;
+								case 'gecko':
+									// Standards Compliant code fork...
+							var oTable = document.getElementById("span" + Node);
+									break;
+							}
+					return (oTable && oTable.style.display == "block");
+				}
+				
+				function toggleNodeVisibility(Node){
+					if (nodeIsVisible(Node)){
+						hideNode(Node);
+					}else{
+						showNode(Node);
+					}
+				}
+			</script>
+					</head>
+		<body>
+						<h3 class="package-title">PHPSpec</h3>
+<div class="tree">
+<script language="Javascript">
+if (document.getElementById) {
+			var tree = new WebFXTree('<span class="package">PHPSpec</span>');
+		tree.setBehavior('classic');
+		tree.openIcon = 'media/images/package.png';
+		tree.icon = 'media/images/package.png';
+	
+					var todos = new WebFXTreeItem('To-do List', 'todolist.html');
+			todos.openIcon = 'media/images/Index.png';
+			todos.icon = 'media/images/Index.png';
+			tree.add(todos);
+		
+		var class_trees = new WebFXTreeItem('Class trees', 'classtrees_PHPSpec.html');
+		class_trees.openIcon = 'media/images/Index.png';
+		class_trees.icon = 'media/images/Index.png';
+		tree.add(class_trees);
+
+		var elements = new WebFXTreeItem('Index of elements', 'elementindex_PHPSpec.html');
+		elements.openIcon = 'media/images/Index.png';
+		elements.icon = 'media/images/Index.png';
+		tree.add(elements);
+
+		var parent_node;
+
+		
+					var tree_classe = new WebFXTreeItem('Interface(s)', '');
+			tree_classe.openIcon = 'media/images/class_folder.png';
+			tree_classe.icon = 'media/images/class_folder.png';
+			
+						    						    						    						    						    						    						    						    						    						    						    						    						    						    						    						    						    						    						    						    						    						    				var classe = new WebFXTreeItem('PHPSpec_Matcher_Interface', 'PHPSpec/PHPSpec_Matcher_Interface.html');
+				classe.openIcon = 'media/images/Interface.png';
+				classe.icon = 'media/images/Interface.png';
+				tree_classe.add(classe);
+										    						    						    						    						    						    						    						    						    						    						    						    						    						    						    						    						    						    						    						    						    						    						    						    						    						    						    						    						    				
+			tree.add(tree_classe);
+		
+					var tree_classe = new WebFXTreeItem('Class(es)', '');
+			tree_classe.openIcon = 'media/images/class_folder.png';
+			tree_classe.icon = 'media/images/class_folder.png';
+			
+						    				var classe = new WebFXTreeItem('PHPSpec_Console_Command', 'PHPSpec/PHPSpec_Console_Command.html');
+				classe.openIcon = 'media/images/Class.png';
+				classe.icon = 'media/images/Class.png';
+				tree_classe.add(classe);
+										    				var classe = new WebFXTreeItem('PHPSpec_Console_Getopt', 'PHPSpec/PHPSpec_Console_Getopt.html');
+				classe.openIcon = 'media/images/Class.png';
+				classe.icon = 'media/images/Class.png';
+				tree_classe.add(classe);
+										    				var classe = new WebFXTreeItem('PHPSpec_Context', 'PHPSpec/PHPSpec_Context.html');
+				classe.openIcon = 'media/images/Class.png';
+				classe.icon = 'media/images/Class.png';
+				tree_classe.add(classe);
+										    				var classe = new WebFXTreeItem('PHPSpec_Exception', 'PHPSpec/PHPSpec_Exception.html');
+				classe.openIcon = 'media/images/Class.png';
+				classe.icon = 'media/images/Class.png';
+				tree_classe.add(classe);
+										    				var classe = new WebFXTreeItem('PHPSpec_Expectation', 'PHPSpec/PHPSpec_Expectation.html');
+				classe.openIcon = 'media/images/Class.png';
+				classe.icon = 'media/images/Class.png';
+				tree_classe.add(classe);
+										    				var classe = new WebFXTreeItem('PHPSpec_Framework', 'PHPSpec/PHPSpec_Framework.html');
+				classe.openIcon = 'media/images/Class.png';
+				classe.icon = 'media/images/Class.png';
+				tree_classe.add(classe);
+										    				var classe = new WebFXTreeItem('PHPSpec_Matcher_Be', 'PHPSpec/PHPSpec_Matcher_Be.html');
+				classe.openIcon = 'media/images/Class.png';
+				classe.icon = 'media/images/Class.png';
+				tree_classe.add(classe);
+										    				var classe = new WebFXTreeItem('PHPSpec_Matcher_BeAnInstanceOf', 'PHPSpec/PHPSpec_Matcher_BeAnInstanceOf.html');
+				classe.openIcon = 'media/images/Class.png';
+				classe.icon = 'media/images/Class.png';
+				tree_classe.add(classe);
+										    				var classe = new WebFXTreeItem('PHPSpec_Matcher_BeEmpty', 'PHPSpec/PHPSpec_Matcher_BeEmpty.html');
+				classe.openIcon = 'media/images/Class.png';
+				classe.icon = 'media/images/Class.png';
+				tree_classe.add(classe);
+										    				var classe = new WebFXTreeItem('PHPSpec_Matcher_BeEqualTo', 'PHPSpec/PHPSpec_Matcher_BeEqualTo.html');
+				classe.openIcon = 'media/images/Class.png';
+				classe.icon = 'media/images/Class.png';
+				tree_classe.add(classe);
+										    				var classe = new WebFXTreeItem('PHPSpec_Matcher_BeFalse', 'PHPSpec/PHPSpec_Matcher_BeFalse.html');
+				classe.openIcon = 'media/images/Class.png';
+				classe.icon = 'media/images/Class.png';
+				tree_classe.add(classe);
+										    				var classe = new WebFXTreeItem('PHPSpec_Matcher_BeGreaterThan', 'PHPSpec/PHPSpec_Matcher_BeGreaterThan.html');
+				classe.openIcon = 'media/images/Class.png';
+				classe.icon = 'media/images/Class.png';
+				tree_classe.add(classe);
+										    				var classe = new WebFXTreeItem('PHPSpec_Matcher_BeGreaterThanOrEqualTo', 'PHPSpec/PHPSpec_Matcher_BeGreaterThanOrEqualTo.html');
+				classe.openIcon = 'media/images/Class.png';
+				classe.icon = 'media/images/Class.png';
+				tree_classe.add(classe);
+										    				var classe = new WebFXTreeItem('PHPSpec_Matcher_BeInteger', 'PHPSpec/PHPSpec_Matcher_BeInteger.html');
+				classe.openIcon = 'media/images/Class.png';
+				classe.icon = 'media/images/Class.png';
+				tree_classe.add(classe);
+										    				var classe = new WebFXTreeItem('PHPSpec_Matcher_BeLessThan', 'PHPSpec/PHPSpec_Matcher_BeLessThan.html');
+				classe.openIcon = 'media/images/Class.png';
+				classe.icon = 'media/images/Class.png';
+				tree_classe.add(classe);
+										    				var classe = new WebFXTreeItem('PHPSpec_Matcher_BeLessThanOrEqualTo', 'PHPSpec/PHPSpec_Matcher_BeLessThanOrEqualTo.html');
+				classe.openIcon = 'media/images/Class.png';
+				classe.icon = 'media/images/Class.png';
+				tree_classe.add(classe);
+										    				var classe = new WebFXTreeItem('PHPSpec_Matcher_BeNull', 'PHPSpec/PHPSpec_Matcher_BeNull.html');
+				classe.openIcon = 'media/images/Class.png';
+				classe.icon = 'media/images/Class.png';
+				tree_classe.add(classe);
+										    				var classe = new WebFXTreeItem('PHPSpec_Matcher_BeString', 'PHPSpec/PHPSpec_Matcher_BeString.html');
+				classe.openIcon = 'media/images/Class.png';
+				classe.icon = 'media/images/Class.png';
+				tree_classe.add(classe);
+										    				var classe = new WebFXTreeItem('PHPSpec_Matcher_BeTrue', 'PHPSpec/PHPSpec_Matcher_BeTrue.html');
+				classe.openIcon = 'media/images/Class.png';
+				classe.icon = 'media/images/Class.png';
+				tree_classe.add(classe);
+										    				var classe = new WebFXTreeItem('PHPSpec_Matcher_Equal', 'PHPSpec/PHPSpec_Matcher_Equal.html');
+				classe.openIcon = 'media/images/Class.png';
+				classe.icon = 'media/images/Class.png';
+				tree_classe.add(classe);
+										    				var classe = new WebFXTreeItem('PHPSpec_Matcher_Exception', 'PHPSpec/PHPSpec_Matcher_Exception.html');
+				classe.openIcon = 'media/images/Class.png';
+				classe.icon = 'media/images/Class.png';
+				tree_classe.add(classe);
+										    						    				var classe = new WebFXTreeItem('PHPSpec_Matcher_Match', 'PHPSpec/PHPSpec_Matcher_Match.html');
+				classe.openIcon = 'media/images/Class.png';
+				classe.icon = 'media/images/Class.png';
+				tree_classe.add(classe);
+										    				var classe = new WebFXTreeItem('PHPSpec_Matcher_Predicate', 'PHPSpec/PHPSpec_Matcher_Predicate.html');
+				classe.openIcon = 'media/images/Class.png';
+				classe.icon = 'media/images/Class.png';
+				tree_classe.add(classe);
+										    				var classe = new WebFXTreeItem('PHPSpec_Object_Interrogator', 'PHPSpec/PHPSpec_Object_Interrogator.html');
+				classe.openIcon = 'media/images/Class.png';
+				classe.icon = 'media/images/Class.png';
+				tree_classe.add(classe);
+										    				var classe = new WebFXTreeItem('PHPSpec_Runner_Base', 'PHPSpec/PHPSpec_Runner_Base.html');
+				classe.openIcon = 'media/images/Class.png';
+				classe.icon = 'media/images/Class.png';
+				tree_classe.add(classe);
+										    				var classe = new WebFXTreeItem('PHPSpec_Runner_Collection', 'PHPSpec/PHPSpec_Runner_Collection.html');
+				classe.openIcon = 'media/images/Class.png';
+				classe.icon = 'media/images/Class.png';
+				tree_classe.add(classe);
+										    				var classe = new WebFXTreeItem('PHPSpec_Runner_DeliberateFailException', 'PHPSpec/PHPSpec_Runner_DeliberateFailException.html');
+				classe.openIcon = 'media/images/Class.png';
+				classe.icon = 'media/images/Class.png';
+				tree_classe.add(classe);
+										    				var classe = new WebFXTreeItem('PHPSpec_Runner_ErrorException', 'PHPSpec/PHPSpec_Runner_ErrorException.html');
+				classe.openIcon = 'media/images/Class.png';
+				classe.icon = 'media/images/Class.png';
+				tree_classe.add(classe);
+										    				var classe = new WebFXTreeItem('PHPSpec_Runner_Example', 'PHPSpec/PHPSpec_Runner_Example.html');
+				classe.openIcon = 'media/images/Class.png';
+				classe.icon = 'media/images/Class.png';
+				tree_classe.add(classe);
+										    				var classe = new WebFXTreeItem('PHPSpec_Runner_Example_DeliberateFail', 'PHPSpec/PHPSpec_Runner_Example_DeliberateFail.html');
+				classe.openIcon = 'media/images/Class.png';
+				classe.icon = 'media/images/Class.png';
+				tree_classe.add(classe);
+										    				var classe = new WebFXTreeItem('PHPSpec_Runner_Example_Error', 'PHPSpec/PHPSpec_Runner_Example_Error.html');
+				classe.openIcon = 'media/images/Class.png';
+				classe.icon = 'media/images/Class.png';
+				tree_classe.add(classe);
+										    				var classe = new WebFXTreeItem('PHPSpec_Runner_Example_Exception', 'PHPSpec/PHPSpec_Runner_Example_Exception.html');
+				classe.openIcon = 'media/images/Class.png';
+				classe.icon = 'media/images/Class.png';
+				tree_classe.add(classe);
+										    				var classe = new WebFXTreeItem('PHPSpec_Runner_Example_Fail', 'PHPSpec/PHPSpec_Runner_Example_Fail.html');
+				classe.openIcon = 'media/images/Class.png';
+				classe.icon = 'media/images/Class.png';
+				tree_classe.add(classe);
+										    				var classe = new WebFXTreeItem('PHPSpec_Runner_Example_Pass', 'PHPSpec/PHPSpec_Runner_Example_Pass.html');
+				classe.openIcon = 'media/images/Class.png';
+				classe.icon = 'media/images/Class.png';
+				tree_classe.add(classe);
+										    				var classe = new WebFXTreeItem('PHPSpec_Runner_Example_Pending', 'PHPSpec/PHPSpec_Runner_Example_Pending.html');
+				classe.openIcon = 'media/images/Class.png';
+				classe.icon = 'media/images/Class.png';
+				tree_classe.add(classe);
+										    				var classe = new WebFXTreeItem('PHPSpec_Runner_Example_Type', 'PHPSpec/PHPSpec_Runner_Example_Type.html');
+				classe.openIcon = 'media/images/Class.png';
+				classe.icon = 'media/images/Class.png';
+				tree_classe.add(classe);
+										    				var classe = new WebFXTreeItem('PHPSpec_Runner_FailedMatcherException', 'PHPSpec/PHPSpec_Runner_FailedMatcherException.html');
+				classe.openIcon = 'media/images/Class.png';
+				classe.icon = 'media/images/Class.png';
+				tree_classe.add(classe);
+										    				var classe = new WebFXTreeItem('PHPSpec_Runner_Filter_Standard', 'PHPSpec/PHPSpec_Runner_Filter_Standard.html');
+				classe.openIcon = 'media/images/Class.png';
+				classe.icon = 'media/images/Class.png';
+				tree_classe.add(classe);
+										    				var classe = new WebFXTreeItem('PHPSpec_Runner_Loader_Classname', 'PHPSpec/PHPSpec_Runner_Loader_Classname.html');
+				classe.openIcon = 'media/images/Class.png';
+				classe.icon = 'media/images/Class.png';
+				tree_classe.add(classe);
+										    				var classe = new WebFXTreeItem('PHPSpec_Runner_Loader_DirectoryRecursive', 'PHPSpec/PHPSpec_Runner_Loader_DirectoryRecursive.html');
+				classe.openIcon = 'media/images/Class.png';
+				classe.icon = 'media/images/Class.png';
+				tree_classe.add(classe);
+										    				var classe = new WebFXTreeItem('PHPSpec_Runner_PendingException', 'PHPSpec/PHPSpec_Runner_PendingException.html');
+				classe.openIcon = 'media/images/Class.png';
+				classe.icon = 'media/images/Class.png';
+				tree_classe.add(classe);
+										    				var classe = new WebFXTreeItem('PHPSpec_Runner_Phpt', 'PHPSpec/PHPSpec_Runner_Phpt.html');
+				classe.openIcon = 'media/images/Class.png';
+				classe.icon = 'media/images/Class.png';
+				tree_classe.add(classe);
+										    				var classe = new WebFXTreeItem('PHPSpec_Runner_Reporter', 'PHPSpec/PHPSpec_Runner_Reporter.html');
+				classe.openIcon = 'media/images/AbstractClass.png';
+				classe.icon = 'media/images/AbstractClass.png';
+				tree_classe.add(classe);
+										    				var classe = new WebFXTreeItem('PHPSpec_Runner_Reporter_Console', 'PHPSpec/PHPSpec_Runner_Reporter_Console.html');
+				classe.openIcon = 'media/images/Class.png';
+				classe.icon = 'media/images/Class.png';
+				tree_classe.add(classe);
+										    				var classe = new WebFXTreeItem('PHPSpec_Runner_Reporter_Html', 'PHPSpec/PHPSpec_Runner_Reporter_Html.html');
+				classe.openIcon = 'media/images/Class.png';
+				classe.icon = 'media/images/Class.png';
+				tree_classe.add(classe);
+										    				var classe = new WebFXTreeItem('PHPSpec_Runner_Reporter_Text', 'PHPSpec/PHPSpec_Runner_Reporter_Text.html');
+				classe.openIcon = 'media/images/Class.png';
+				classe.icon = 'media/images/Class.png';
+				tree_classe.add(classe);
+										    				var classe = new WebFXTreeItem('PHPSpec_Runner_Result', 'PHPSpec/PHPSpec_Runner_Result.html');
+				classe.openIcon = 'media/images/Class.png';
+				classe.icon = 'media/images/Class.png';
+				tree_classe.add(classe);
+										    				var classe = new WebFXTreeItem('PHPSpec_Specification', 'PHPSpec/PHPSpec_Specification.html');
+				classe.openIcon = 'media/images/Class.png';
+				classe.icon = 'media/images/Class.png';
+				tree_classe.add(classe);
+										    				var classe = new WebFXTreeItem('PHPSpec_Specification_Object', 'PHPSpec/PHPSpec_Specification_Object.html');
+				classe.openIcon = 'media/images/Class.png';
+				classe.icon = 'media/images/Class.png';
+				tree_classe.add(classe);
+										    				var classe = new WebFXTreeItem('PHPSpec_Specification_Scalar', 'PHPSpec/PHPSpec_Specification_Scalar.html');
+				classe.openIcon = 'media/images/Class.png';
+				classe.icon = 'media/images/Class.png';
+				tree_classe.add(classe);
+								
+			tree.add(tree_classe);
+		
+					var tree_function = new WebFXTreeItem('Function(s)', '');
+			tree_function.openIcon = 'media/images/function_folder.png';
+			tree_function.icon = 'media/images/function_folder.png';
+			
+							var fic = new WebFXTreeItem('describe', 'PHPSpec/_PHPSpec---Framework.php.html#functiondescribe');
+				fic.openIcon = 'media/images/Function.png';
+				fic.icon = 'media/images/Function.png';
+				tree_function.add(fic);
+							var fic = new WebFXTreeItem('PHPSpec_ErrorHandler', 'PHPSpec/_PHPSpec---Framework.php.html#functionPHPSpec_ErrorHandler');
+				fic.openIcon = 'media/images/Function.png';
+				fic.icon = 'media/images/Function.png';
+				tree_function.add(fic);
+					
+			tree.add(tree_function);
+			
+					var tree_file = new WebFXTreeItem('File(s)', '');
+			tree_file.openIcon = 'media/images/folder.png';
+			tree_file.icon = 'media/images/folder.png';
+	
+							var file = new WebFXTreeItem('Base.php', 'PHPSpec/_PHPSpec---Runner---Base.php.html');
+				file.openIcon = 'media/images/Page.png';
+				file.icon = 'media/images/Page.png';
+				tree_file.add(file);
+							var file = new WebFXTreeItem('Be.php', 'PHPSpec/_PHPSpec---Matcher---Be.php.html');
+				file.openIcon = 'media/images/Page.png';
+				file.icon = 'media/images/Page.png';
+				tree_file.add(file);
+							var file = new WebFXTreeItem('BeAnInstanceOf.php', 'PHPSpec/_PHPSpec---Matcher---BeAnInstanceOf.php.html');
+				file.openIcon = 'media/images/Page.png';
+				file.icon = 'media/images/Page.png';
+				tree_file.add(file);
+							var file = new WebFXTreeItem('BeEmpty.php', 'PHPSpec/_PHPSpec---Matcher---BeEmpty.php.html');
+				file.openIcon = 'media/images/Page.png';
+				file.icon = 'media/images/Page.png';
+				tree_file.add(file);
+							var file = new WebFXTreeItem('BeEqualTo.php', 'PHPSpec/_PHPSpec---Matcher---BeEqualTo.php.html');
+				file.openIcon = 'media/images/Page.png';
+				file.icon = 'media/images/Page.png';
+				tree_file.add(file);
+							var file = new WebFXTreeItem('BeFalse.php', 'PHPSpec/_PHPSpec---Matcher---BeFalse.php.html');
+				file.openIcon = 'media/images/Page.png';
+				file.icon = 'media/images/Page.png';
+				tree_file.add(file);
+							var file = new WebFXTreeItem('BeGreaterThan.php', 'PHPSpec/_PHPSpec---Matcher---BeGreaterThan.php.html');
+				file.openIcon = 'media/images/Page.png';
+				file.icon = 'media/images/Page.png';
+				tree_file.add(file);
+							var file = new WebFXTreeItem('BeGreaterThanOrEqualTo.php', 'PHPSpec/_PHPSpec---Matcher---BeGreaterThanOrEqualTo.php.html');
+				file.openIcon = 'media/images/Page.png';
+				file.icon = 'media/images/Page.png';
+				tree_file.add(file);
+							var file = new WebFXTreeItem('beInteger.php', 'PHPSpec/_PHPSpec---Matcher---beInteger.php.html');
+				file.openIcon = 'media/images/Page.png';
+				file.icon = 'media/images/Page.png';
+				tree_file.add(file);
+							var file = new WebFXTreeItem('BeLessThan.php', 'PHPSpec/_PHPSpec---Matcher---BeLessThan.php.html');
+				file.openIcon = 'media/images/Page.png';
+				file.icon = 'media/images/Page.png';
+				tree_file.add(file);
+							var file = new WebFXTreeItem('BeLessThanOrEqualTo.php', 'PHPSpec/_PHPSpec---Matcher---BeLessThanOrEqualTo.php.html');
+				file.openIcon = 'media/images/Page.png';
+				file.icon = 'media/images/Page.png';
+				tree_file.add(file);
+							var file = new WebFXTreeItem('BeNull.php', 'PHPSpec/_PHPSpec---Matcher---BeNull.php.html');
+				file.openIcon = 'media/images/Page.png';
+				file.icon = 'media/images/Page.png';
+				tree_file.add(file);
+							var file = new WebFXTreeItem('beString.php', 'PHPSpec/_PHPSpec---Matcher---beString.php.html');
+				file.openIcon = 'media/images/Page.png';
+				file.icon = 'media/images/Page.png';
+				tree_file.add(file);
+							var file = new WebFXTreeItem('BeTrue.php', 'PHPSpec/_PHPSpec---Matcher---BeTrue.php.html');
+				file.openIcon = 'media/images/Page.png';
+				file.icon = 'media/images/Page.png';
+				tree_file.add(file);
+							var file = new WebFXTreeItem('Classname.php', 'PHPSpec/_PHPSpec---Runner---Loader---Classname.php.html');
+				file.openIcon = 'media/images/Page.png';
+				file.icon = 'media/images/Page.png';
+				tree_file.add(file);
+							var file = new WebFXTreeItem('Collection.php', 'PHPSpec/_PHPSpec---Runner---Collection.php.html');
+				file.openIcon = 'media/images/Page.png';
+				file.icon = 'media/images/Page.png';
+				tree_file.add(file);
+							var file = new WebFXTreeItem('Command.php', 'PHPSpec/_PHPSpec---Console---Command.php.html');
+				file.openIcon = 'media/images/Page.png';
+				file.icon = 'media/images/Page.png';
+				tree_file.add(file);
+							var file = new WebFXTreeItem('Console.php', 'PHPSpec/_PHPSpec---Runner---Reporter---Console.php.html');
+				file.openIcon = 'media/images/Page.png';
+				file.icon = 'media/images/Page.png';
+				tree_file.add(file);
+							var file = new WebFXTreeItem('Context.php', 'PHPSpec/_PHPSpec---Context.php.html');
+				file.openIcon = 'media/images/Page.png';
+				file.icon = 'media/images/Page.png';
+				tree_file.add(file);
+							var file = new WebFXTreeItem('DeliberateFail.php', 'PHPSpec/_PHPSpec---Runner---Example---DeliberateFail.php.html');
+				file.openIcon = 'media/images/Page.png';
+				file.icon = 'media/images/Page.png';
+				tree_file.add(file);
+							var file = new WebFXTreeItem('DeliberateFailException.php', 'PHPSpec/_PHPSpec---Runner---DeliberateFailException.php.html');
+				file.openIcon = 'media/images/Page.png';
+				file.icon = 'media/images/Page.png';
+				tree_file.add(file);
+							var file = new WebFXTreeItem('DirectoryRecursive.php', 'PHPSpec/_PHPSpec---Runner---Loader---DirectoryRecursive.php.html');
+				file.openIcon = 'media/images/Page.png';
+				file.icon = 'media/images/Page.png';
+				tree_file.add(file);
+							var file = new WebFXTreeItem('Equal.php', 'PHPSpec/_PHPSpec---Matcher---Equal.php.html');
+				file.openIcon = 'media/images/Page.png';
+				file.icon = 'media/images/Page.png';
+				tree_file.add(file);
+							var file = new WebFXTreeItem('Error.php', 'PHPSpec/_PHPSpec---Runner---Example---Error.php.html');
+				file.openIcon = 'media/images/Page.png';
+				file.icon = 'media/images/Page.png';
+				tree_file.add(file);
+							var file = new WebFXTreeItem('ErrorException.php', 'PHPSpec/_PHPSpec---Runner---ErrorException.php.html');
+				file.openIcon = 'media/images/Page.png';
+				file.icon = 'media/images/Page.png';
+				tree_file.add(file);
+							var file = new WebFXTreeItem('Example.php', 'PHPSpec/_PHPSpec---Runner---Example.php.html');
+				file.openIcon = 'media/images/Page.png';
+				file.icon = 'media/images/Page.png';
+				tree_file.add(file);
+							var file = new WebFXTreeItem('Exception.php', 'PHPSpec/_PHPSpec---Matcher---Exception.php.html');
+				file.openIcon = 'media/images/Page.png';
+				file.icon = 'media/images/Page.png';
+				tree_file.add(file);
+							var file = new WebFXTreeItem('Exception.php', 'PHPSpec/_PHPSpec---Runner---Example---Exception.php.html');
+				file.openIcon = 'media/images/Page.png';
+				file.icon = 'media/images/Page.png';
+				tree_file.add(file);
+							var file = new WebFXTreeItem('Exception.php', 'PHPSpec/_PHPSpec---Exception.php.html');
+				file.openIcon = 'media/images/Page.png';
+				file.icon = 'media/images/Page.png';
+				tree_file.add(file);
+							var file = new WebFXTreeItem('Expectation.php', 'PHPSpec/_PHPSpec---Expectation.php.html');
+				file.openIcon = 'media/images/Page.png';
+				file.icon = 'media/images/Page.png';
+				tree_file.add(file);
+							var file = new WebFXTreeItem('Fail.php', 'PHPSpec/_PHPSpec---Runner---Example---Fail.php.html');
+				file.openIcon = 'media/images/Page.png';
+				file.icon = 'media/images/Page.png';
+				tree_file.add(file);
+							var file = new WebFXTreeItem('FailedMatcherException.php', 'PHPSpec/_PHPSpec---Runner---FailedMatcherException.php.html');
+				file.openIcon = 'media/images/Page.png';
+				file.icon = 'media/images/Page.png';
+				tree_file.add(file);
+							var file = new WebFXTreeItem('Framework.php', 'PHPSpec/_PHPSpec---Framework.php.html');
+				file.openIcon = 'media/images/Page.png';
+				file.icon = 'media/images/Page.png';
+				tree_file.add(file);
+							var file = new WebFXTreeItem('Getopt.php', 'PHPSpec/_PHPSpec---Console---Getopt.php.html');
+				file.openIcon = 'media/images/Page.png';
+				file.icon = 'media/images/Page.png';
+				tree_file.add(file);
+							var file = new WebFXTreeItem('Interface.php', 'PHPSpec/_PHPSpec---Matcher---Interface.php.html');
+				file.openIcon = 'media/images/Page.png';
+				file.icon = 'media/images/Page.png';
+				tree_file.add(file);
+							var file = new WebFXTreeItem('Interrogator.php', 'PHPSpec/_PHPSpec---Object---Interrogator.php.html');
+				file.openIcon = 'media/images/Page.png';
+				file.icon = 'media/images/Page.png';
+				tree_file.add(file);
+							var file = new WebFXTreeItem('Match.php', 'PHPSpec/_PHPSpec---Matcher---Match.php.html');
+				file.openIcon = 'media/images/Page.png';
+				file.icon = 'media/images/Page.png';
+				tree_file.add(file);
+							var file = new WebFXTreeItem('Object.php', 'PHPSpec/_PHPSpec---Specification---Object.php.html');
+				file.openIcon = 'media/images/Page.png';
+				file.icon = 'media/images/Page.png';
+				tree_file.add(file);
+							var file = new WebFXTreeItem('Pass.php', 'PHPSpec/_PHPSpec---Runner---Example---Pass.php.html');
+				file.openIcon = 'media/images/Page.png';
+				file.icon = 'media/images/Page.png';
+				tree_file.add(file);
+							var file = new WebFXTreeItem('Pending.php', 'PHPSpec/_PHPSpec---Runner---Example---Pending.php.html');
+				file.openIcon = 'media/images/Page.png';
+				file.icon = 'media/images/Page.png';
+				tree_file.add(file);
+							var file = new WebFXTreeItem('PendingException.php', 'PHPSpec/_PHPSpec---Runner---PendingException.php.html');
+				file.openIcon = 'media/images/Page.png';
+				file.icon = 'media/images/Page.png';
+				tree_file.add(file);
+							var file = new WebFXTreeItem('Phpt.php', 'PHPSpec/_PHPSpec---Runner---Phpt.php.html');
+				file.openIcon = 'media/images/Page.png';
+				file.icon = 'media/images/Page.png';
+				tree_file.add(file);
+							var file = new WebFXTreeItem('Predicate.php', 'PHPSpec/_PHPSpec---Matcher---Predicate.php.html');
+				file.openIcon = 'media/images/Page.png';
+				file.icon = 'media/images/Page.png';
+				tree_file.add(file);
+							var file = new WebFXTreeItem('Reporter.php', 'PHPSpec/_PHPSpec---Runner---Reporter.php.html');
+				file.openIcon = 'media/images/Page.png';
+				file.icon = 'media/images/Page.png';
+				tree_file.add(file);
+							var file = new WebFXTreeItem('Result.php', 'PHPSpec/_PHPSpec---Runner---Result.php.html');
+				file.openIcon = 'media/images/Page.png';
+				file.icon = 'media/images/Page.png';
+				tree_file.add(file);
+							var file = new WebFXTreeItem('Scalar.php', 'PHPSpec/_PHPSpec---Specification---Scalar.php.html');
+				file.openIcon = 'media/images/Page.png';
+				file.icon = 'media/images/Page.png';
+				tree_file.add(file);
+							var file = new WebFXTreeItem('Specification.php', 'PHPSpec/_PHPSpec---Specification.php.html');
+				file.openIcon = 'media/images/Page.png';
+				file.icon = 'media/images/Page.png';
+				tree_file.add(file);
+							var file = new WebFXTreeItem('Standard.php', 'PHPSpec/_PHPSpec---Runner---Filter---Standard.php.html');
+				file.openIcon = 'media/images/Page.png';
+				file.icon = 'media/images/Page.png';
+				tree_file.add(file);
+							var file = new WebFXTreeItem('Text.php', 'PHPSpec/_PHPSpec---Runner---Reporter---Text.php.html');
+				file.openIcon = 'media/images/Page.png';
+				file.icon = 'media/images/Page.png';
+				tree_file.add(file);
+							var file = new WebFXTreeItem('Type.php', 'PHPSpec/_PHPSpec---Runner---Example---Type.php.html');
+				file.openIcon = 'media/images/Page.png';
+				file.icon = 'media/images/Page.png';
+				tree_file.add(file);
+				
+			tree.add(tree_file);
+		
+	
+document.write(tree);
+}
+</script>
+</div>
+<p class="notes">
+	Generated by 
+	<a href="http://www.phpdoc.org" target="_blank">phpDocumentor <span class="field">1.4.1</span></a>
+</p>
+</body>
+</html>

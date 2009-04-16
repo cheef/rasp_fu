@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Chapter 5. Writing Specs with PHPSpec</title>
+    <link rel="stylesheet" href="style.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="PHPSpec Reference Manual" />
+    <link rel="up" href="index.html" title="PHPSpec Reference Manual" />
+    <link rel="prev" href="phpspecs.goals.html" title="Chapter 4. PHPSpec's Goals" />
+    <link rel="next" href="before.writing.code.specify.its.required.behaviour.html" title="5.2. Before Writing Code, Specify Its Required Behaviour" />
+    <link rel="preface" href="preface.html" title="Preface" />
+    <link rel="chapter" href="installing.phpspec.html" title="Chapter 1. Installing PHPSpec" />
+    <link rel="chapter" href="getting.started.html" title="Chapter 2. Getting Started" />
+    <link rel="chapter" href="introduction.html" title="Chapter 3. Introduction" />
+    <link rel="chapter" href="phpspecs.goals.html" title="Chapter 4. PHPSpec's Goals" />
+    <link rel="chapter" href="writing.specs.with.phpspec.html" title="Chapter 5. Writing Specs with PHPSpec" />
+    <link rel="chapter" href="execution.methods.for.phpspec.html" title="Chapter 6. Execution Methods for PHPSpec" />
+    <link rel="appendix" href="copyrights.html" title="Appendix A. Copyright Information" />
+    <link rel="index" href="the.index.html" title="Index" />
+    <link rel="section" href="writing.specs.with.phpspec.html#specs.examples.and.contexts" title="5.1. Specs, Examples and Contexts" />
+    <link rel="section" href="before.writing.code.specify.its.required.behaviour.html" title="5.2. Before Writing Code, Specify Its Required Behaviour" />
+    <link rel="section" href="spec.domain.specific.language.html" title="5.3. The Spec Domain Specific Language (DSL)" />
+  </head>
+  <body>
+    <div class="navheader">
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">Chapter 5. Writing Specs with PHPSpec</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="phpspecs.goals.html">Prev</a> </td>
+          <th width="60%" align="center"> </th>
+          <td width="20%" align="right"> <a accesskey="n" href="before.writing.code.specify.its.required.behaviour.html">Next</a></td>
+        </tr>
+      </table>
+    </div>
+    <div class="chapter" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title"><a id="writing.specs.with.phpspec"></a>Chapter 5. Writing Specs with PHPSpec</h2>
+          </div>
+        </div>
+      </div>
+      <div class="toc">
+        <p>
+          <b>Table of Contents</b>
+        </p>
+        <dl>
+          <dt>
+            <span class="section">
+              <a href="writing.specs.with.phpspec.html#specs.examples.and.contexts">5.1. Specs, Examples and Contexts</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="section">
+              <a href="before.writing.code.specify.its.required.behaviour.html">5.2. Before Writing Code, Specify Its Required Behaviour</a>
+            </span>
+          </dt>
+          <dd>
+            <dl>
+              <dt>
+                <span class="section">
+                  <a href="before.writing.code.specify.its.required.behaviour.html#explaining.the.phpspec.spec.layout">5.2.1. Explaining the PHPSpec Spec Layout</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="section">
+                  <a href="before.writing.code.specify.its.required.behaviour.html#the.code.to.implement.the.new.filesystem.logger.specification">5.2.2. The Code To Implement The New Filesystem Logger
+      Specification</a>
+                </span>
+              </dt>
+            </dl>
+          </dd>
+          <dt>
+            <span class="section">
+              <a href="spec.domain.specific.language.html">5.3. The Spec Domain Specific Language (DSL)</a>
+            </span>
+          </dt>
+          <dd>
+            <dl>
+              <dt>
+                <span class="section">
+                  <a href="spec.domain.specific.language.html#actual.value.term">5.3.1. The Actual Value Term</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="section">
+                  <a href="spec.domain.specific.language.html#id568903">5.3.2. The Expectation Term (Should or Should Not)</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="section">
+                  <a href="spec.domain.specific.language.html#id569239">5.3.3. The Matcher Term</a>
+                </span>
+              </dt>
+            </dl>
+          </dd>
+        </dl>
+      </div>
+      <div class="section" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h2 class="title" style="clear: both"><a id="specs.examples.and.contexts"></a>5.1. Specs, Examples and Contexts</h2>
+            </div>
+          </div>
+        </div>
+        <p>The terminology used throughout Behaviour-Driven Development is
+    focused entirely on the concept of describing behaviour. This alleviates
+    any misunderstanding from attempting to describe the process of
+    Test-Driven Development in terms of tests - a counterintuitive notion for
+    many programmers.</p>
+        <p>The terms Spec<a id="id572381" class="indexterm"></a> and Example<a id="id571909" class="indexterm"></a> are almost used interchangeably. While a Spec refers to a
+    single behavioural requirement, often captured as a simple sentence of the
+    form "it should do something", an Example refers to the the entire method
+    within PHPSpec which demonstrates this Spec in code. If you take the
+    example below, the spec is the line of code commencing with
+    <code class="classname">$this-&gt;spec()</code> and the example is the entire
+    public method which shows how this spec is achievable</p>
+        <div class="example">
+          <a id="id569974"></a>
+          <p class="title">
+            <b>Example 5.1. A Spec in a PHPSpec Example Method</b>
+          </p>
+          <div class="example-contents">
+            <pre class="programlisting">public function itShouldHaveScoreOfZero()
+{
+    $bowling = new Bowling;
+    $bowling-&gt;hit(0);
+    $this-&gt;spec($bowling-&gt;score)-&gt;should-&gt;be(0);
+}</pre>
+            <p>A more difficult concept is that of a Context<a id="id570024" class="indexterm"></a>. In brief a Context is the set of conditions prevailing
+      at the time we are specifying behaviour. Above, our Bowling example
+      assumes we've just started a new game. This is the Context all our Specs
+      in the same class would share. Later we might want a game which is
+      finished, or partially played. Each different Context helps you explore
+      how behaviour changes under different conditions.</p>
+          </div>
+        </div>
+        <br class="example-break" />
+      </div>
+    </div>
+    <div class="navfooter">
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="phpspecs.goals.html">Prev</a> </td>
+          <td width="20%" align="center"> </td>
+          <td width="40%" align="right"> <a accesskey="n" href="before.writing.code.specify.its.required.behaviour.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">Chapter 4. PHPSpec's Goals </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> 5.2. Before Writing Code, Specify Its Required Behaviour</td>
+        </tr>
+      </table>
+    </div>
+    <div xmlns="" class="revinfo"></div>
+  </body>
+</html>

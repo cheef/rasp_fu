@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>3.2. Source Code Examples As Documentation</title>
+    <link rel="stylesheet" href="style.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="PHPSpec Reference Manual" />
+    <link rel="up" href="introduction.html" title="Chapter 3. Introduction" />
+    <link rel="prev" href="introduction.html" title="Chapter 3. Introduction" />
+    <link rel="next" href="writing.examples.specs.before.writing.code.html" title="3.3. Writing Examples (Specs) Before Writing Code" />
+    <link rel="preface" href="preface.html" title="Preface" />
+    <link rel="chapter" href="installing.phpspec.html" title="Chapter 1. Installing PHPSpec" />
+    <link rel="chapter" href="getting.started.html" title="Chapter 2. Getting Started" />
+    <link rel="chapter" href="introduction.html" title="Chapter 3. Introduction" />
+    <link rel="chapter" href="phpspecs.goals.html" title="Chapter 4. PHPSpec's Goals" />
+    <link rel="chapter" href="writing.specs.with.phpspec.html" title="Chapter 5. Writing Specs with PHPSpec" />
+    <link rel="chapter" href="execution.methods.for.phpspec.html" title="Chapter 6. Execution Methods for PHPSpec" />
+    <link rel="appendix" href="copyrights.html" title="Appendix A. Copyright Information" />
+    <link rel="index" href="the.index.html" title="Index" />
+  </head>
+  <body>
+    <div class="navheader">
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">3.2. Source Code Examples As Documentation</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="introduction.html">Prev</a> </td>
+          <th width="60%" align="center">Chapter 3. Introduction</th>
+          <td width="20%" align="right"> <a accesskey="n" href="writing.examples.specs.before.writing.code.html">Next</a></td>
+        </tr>
+      </table>
+    </div>
+    <div class="section" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="source.code.examples.as.documentation"></a>3.2. Source Code Examples As Documentation</h2>
+          </div>
+        </div>
+      </div>
+      <p>Repeatable tests are all fine and well, but it turns out that they
+    also serve another purpose. Just as a picture is worth a thousand words,
+    in programming a good example of how to use your code is also worth a
+    thousand words<a id="id572346" class="indexterm"></a>. Your repeatable examples, which make great future tests,
+    also act as a guide for users and other programmers in how to correctly
+    use your source code.</p>
+      <p>It's here where I can introduce the idea that the traditional "test"
+    of Unit Testing<a id="id571895" class="indexterm"></a> and Test-Driven Development<a id="id571859" class="indexterm"></a><a id="id571852" class="indexterm"></a> can simply be referred to as an example. Each example you
+    write explains one more facet of behaviour<a id="id571752" class="indexterm"></a> your source code is capable of, how to make that behaviour
+    occur, and what it's effects are. In Behaviour-Driven
+    Development<a id="id569919" class="indexterm"></a>, each such example can also be thought of as a
+    specification (or "spec" for short).</p>
+      <p>In BDD, which promotes the use of a language more readily readable
+    and accessible for coding examples, the value of your specs as
+    documentation is improved using a fluent Domain Specific
+    Language<a id="id570373" class="indexterm"></a>. Consider the differences which make the second example
+    below more clear and legible than the first example.</p>
+      <div class="example">
+        <a id="id570339"></a>
+        <p class="title">
+          <b>Example 3.1. Example with PHPUnit</b>
+        </p>
+        <div class="example-contents">
+          <pre class="programlisting">$logger = new Logger;
+$this-&gt;assertTrue($logger-&gt;hasFile());</pre>
+        </div>
+      </div>
+      <br class="example-break" />
+      <div class="example">
+        <a id="id570296"></a>
+        <p class="title">
+          <b>Example 3.2. Example with PHPSpec</b>
+        </p>
+        <div class="example-contents">
+          <pre class="programlisting">$logger = new Logger;
+$this-&gt;spec($logger)-&gt;should-&gt;haveFile();</pre>
+        </div>
+      </div>
+      <br class="example-break" />
+      <p>Because code examples make for great documentation (not just tests)
+    it's better to have examples which follow the natural flow of plain
+    English to improve their readability and clarity. Not only that but done
+    properly any set of examples should be translatable back into their plain
+    text form so you have a sentence (based on our earlier examples)
+    of:</p>
+      <div class="informalexample">
+        <p>Logger</p>
+        <p>- should have a file</p>
+      </div>
+      <p>Before we continue, remember that BDD is not just TDD with "should"
+    instead of "assert". There are other reasons for BDD's raison d'etre
+    besides a simple language differential from TDD.</p>
+    </div>
+    <div class="navfooter">
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="introduction.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="introduction.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="writing.examples.specs.before.writing.code.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">Chapter 3. Introduction </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> 3.3. Writing Examples (Specs) Before Writing Code</td>
+        </tr>
+      </table>
+    </div>
+    <div xmlns="" class="revinfo"></div>
+  </body>
+</html>

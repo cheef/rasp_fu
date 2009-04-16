@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>6.2. The HTTP Runner</title>
+    <link rel="stylesheet" href="style.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="PHPSpec Reference Manual" />
+    <link rel="up" href="execution.methods.for.phpspec.html" title="Chapter 6. Execution Methods for PHPSpec" />
+    <link rel="prev" href="execution.methods.for.phpspec.html" title="Chapter 6. Execution Methods for PHPSpec" />
+    <link rel="next" href="copyrights.html" title="Appendix A. Copyright Information" />
+    <link rel="preface" href="preface.html" title="Preface" />
+    <link rel="chapter" href="installing.phpspec.html" title="Chapter 1. Installing PHPSpec" />
+    <link rel="chapter" href="getting.started.html" title="Chapter 2. Getting Started" />
+    <link rel="chapter" href="introduction.html" title="Chapter 3. Introduction" />
+    <link rel="chapter" href="phpspecs.goals.html" title="Chapter 4. PHPSpec's Goals" />
+    <link rel="chapter" href="writing.specs.with.phpspec.html" title="Chapter 5. Writing Specs with PHPSpec" />
+    <link rel="chapter" href="execution.methods.for.phpspec.html" title="Chapter 6. Execution Methods for PHPSpec" />
+    <link rel="appendix" href="copyrights.html" title="Appendix A. Copyright Information" />
+    <link rel="index" href="the.index.html" title="Index" />
+  </head>
+  <body>
+    <div class="navheader">
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">6.2. The HTTP Runner</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="execution.methods.for.phpspec.html">Prev</a> </td>
+          <th width="60%" align="center">Chapter 6. Execution Methods for PHPSpec</th>
+          <td width="20%" align="right"> <a accesskey="n" href="copyrights.html">Next</a></td>
+        </tr>
+      </table>
+    </div>
+    <div class="section" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="the.http.runner"></a>6.2. The HTTP Runner</h2>
+          </div>
+        </div>
+      </div>
+      <p>The HTTP Runner is not an immediately available mode. Instead you
+    need to do a small amount of setup within a PHP file which you intend
+    calling from a web browser. This is actually a really simple task, and the
+    available options for utilising a HTTP runner are identical to the options
+    available for the Console Runner as outlined above.</p>
+      <p>Here's a simple example of a HTTP Runner stored to a file called
+    AllSpecs.php.</p>
+      <pre class="programlisting">&lt;?php
+
+require_once 'PHPSpec.php';
+
+$options = new stdClass;
+$options-&gt;recursive = true;
+$options-&gt;specdocs = true;
+$options-&gt;reporter = 'html';
+
+PHPSpec_Runner::run($options);</pre>
+      <p>The <code class="classname">PHPSpec_Runner</code> class is actually used
+    internally by the default Console Runner so what we're doing here is
+    pretty simple. All we're really doing is duplicating the internal work the
+    Console Runner performs within a PHP file we can visit from a web
+    browser.</p>
+      <p>First of all, we include the base PHPSpec.php file. Since PHPSpec
+    takes advantage of PHP5 autoloading, there's no need to include any other
+    PHPSpec files. Secondly, we setup the desired options in a
+    <code class="classname">stdClass</code> (a PHP5 standard class) as object
+    properties - optionally you can also use a plain array since it will just
+    be converted to a standard object internally anyway.</p>
+      <p>The options are typical for a complete execution of all specs.
+    PHPSpec will recursively search the current directory and all child
+    directories for specs to execute, it will output specdoc formatted
+    specifications in plain text along with the results, and it will use the
+    HTML reporter to output HTML.</p>
+      <p>Finally we call PHPSpec_Runner's static run() method. And that's all
+    there is to it! If you only want to execute a sub-directory of your specs,
+    you can copy a similar file to that directory (recursive searching does
+    not traverse parent directories).</p>
+    </div>
+    <div class="navfooter">
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="execution.methods.for.phpspec.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="execution.methods.for.phpspec.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="copyrights.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">Chapter 6. Execution Methods for PHPSpec </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> Appendix A. Copyright Information</td>
+        </tr>
+      </table>
+    </div>
+    <div xmlns="" class="revinfo"></div>
+  </body>
+</html>

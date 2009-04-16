@@ -7,8 +7,8 @@
 
 	class RaspHttpRequester extends RaspAbstractService {
 		public static $default_requester_options = array('port' => 80, 'timeout' => 60);
-		public $handler;
-		private $options = array();
+		public $handler, $get_data = "";
+		public $options = array();
 
 		public function __construct($options = array()){
 			$request_options = array_merge(self::$default_requester_options, $options);
@@ -27,12 +27,13 @@
 			if(RaspArray::index($request_options, 'post', false)){
 				$this->set(array(CURLOPT_POST => 1));
 				if(RaspArray::index($request_options, 'data', false)) $this->set(array(CURLOPT_POSTFIELDS => RaspArray::delete($request_options, 'data')));
-			}
+			} elseif(RaspArray::index($request_options, 'data', false)) $this->get_data = RaspArray::delete($request_options, 'data');
+
 			if(RaspArray::index($request_options, 'cookies', false)) $this->set(array(CURLOPT_COOKIE => RaspArray::delete($request_options, 'cookies')));
 		}
 
 		public function send($url){
-			$this->set(array(CURLOPT_URL => $url));
+			$this->set(array(CURLOPT_URL => $url . (empty($this->get_data) ? '' : '?' . $this->get_data)));
 			return RaspHttpResponse::create(array('source' => $this->request(), 'info' => curl_getinfo($this->handler)));
 		}
 
