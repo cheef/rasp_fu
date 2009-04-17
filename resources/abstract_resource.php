@@ -1,4 +1,6 @@
 <?php
-	class RaspAbstractResource {
+	require_once RASP_PATH . 'abstract_object.php';
+
+	class RaspAbstractResource extends RaspAbstractObject {
 	}
 ?>

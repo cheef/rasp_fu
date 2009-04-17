@@ -3,6 +3,10 @@
 	require_once RASP_TYPES_PATH . 'string.php';
 	require_once RASP_TYPES_PATH . 'array.php';
 	require_once RASP_RESOURCES_PATH . 'database.php';
+	require_once RASP_PATH . 'exception.php';
+	require_once RASP_TOOLS_PATH . 'catcher.php';
+
+	class RaspDatabaseParamsException extends RaspException { public $message = 'No connection params for database'; }
 
 	class RaspActiveRecord {
 
@@ -40,12 +44,44 @@
 		}
 
 		public function save(){
+			return ($this->has_id() ? $this->update() : $this->insert());
 		}
 
 		public function update(){
+			self::establish_connection();
+			$strings_for_update = array();
+			foreach($this->attributes as $attribute => $value)
+				$strings_for_update[] = self::escape($attribute, '`') . ' = ' . self::escape($value);
+			return self::$db->query('UPDATE ' . self::$table_name . ' SET ' . join(',', $strings_for_update) . ' WHERE `id` = ' . $this->attributes['id']);
 		}
 
 		public function insert(){
+			self::establish_connection();
+			$sql = "INSERT INTO " . self::$table_name . "(" . join(',', self::escape($this->attributes_names(), '`')) . ") VALUES (" . join(',', self::escape($this->values())) . ");";
+			return self::$db->query($sql);
+		}
+
+		public function has_id(){
+			return isset($this->attributes['id']) && !empty($this->attributes['id']);
+		}
+
+		public function attributes_names(){
+			$attributes_names = array();
+			foreach($this->attributes as $attribute => $value) $attributes_names[] = $attribute;
+			return $attributes_names;
+		}
+
+		public function values(){
+			$values = array();
+			foreach($this->attributes as $attribute => $value) $values[] = $value;
+			return $values;
+		}
+
+		public static function escape($target, $escaper = "'"){
+			self::establish_connection();
+			if(is_array($target)) foreach($target as $key => $element) $target[$key]  = $escaper . self::$db->escape($element) . $escaper;
+			else $target = $escaper . self::$db->escape($target) . $escaper;
+			return $target;
 		}
 
 		public static function find_all($options = array()){
@@ -57,13 +93,14 @@
 			$returning = array();
 			$reponse_resource = self::$db->query($sql);
 			while($result = self::$db->fetch($reponse_resource)) $returning[] = new self::$class_name($result);
-			self::close_connection();
 			return $returning;
 		}
 
 		public static function establish_connection(){
-			if(empty(self::$connection_params)) die('No params was assign to database connect');
-			return (self::is_connection_established() ? self::$db : self::$db = new self::$database_driver(self::$connection_params));
+			try {
+				if(empty(self::$connection_params)) throw new RaspDatabaseParamsException;
+				return (self::is_connection_established() ? self::$db : (self::$db = new self::$database_driver(self::$connection_params)));
+			} catch(RaspDatabaseParamsException $e) { RaspCatcher::add($e); }
 		}
 
 		public static function close_connection(){
