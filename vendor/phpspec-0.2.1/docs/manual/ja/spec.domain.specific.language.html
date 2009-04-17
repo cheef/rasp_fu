@@ -1,0 +1,533 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>5.3. スペック用のドメイン特化言語 (DSL)</title>
+    <link rel="stylesheet" href="style.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="PHPSpec リファレンスマニュアル" />
+    <link rel="up" href="writing.specs.with.phpspec.html" title="第5章 PHPSpec でのスペックの記述" />
+    <link rel="prev" href="before.writing.code.specify.its.required.behaviour.html" title="5.2. コードを書く前に、まずは要求される振る舞いを定義する" />
+    <link rel="next" href="execution.methods.for.phpspec.html" title="第6章 PHPSpec の実行方法" />
+    <link rel="preface" href="preface.html" title="序文" />
+    <link rel="chapter" href="installing.phpspec.html" title="第1章 PHPSpec のインストール" />
+    <link rel="chapter" href="getting.started.html" title="第2章 さぁはじめましょう" />
+    <link rel="chapter" href="introduction.html" title="第3章 導入" />
+    <link rel="chapter" href="phpspecs.goals.html" title="第4章 PHPSpec の目標" />
+    <link rel="chapter" href="writing.specs.with.phpspec.html" title="第5章 PHPSpec でのスペックの記述" />
+    <link rel="chapter" href="execution.methods.for.phpspec.html" title="第6章 PHPSpec の実行方法" />
+    <link rel="appendix" href="copyrights.html" title="付録 A. 著作権について" />
+    <link rel="index" href="the.index.html" title="目次" />
+    <link rel="subsection" href="spec.domain.specific.language.html#actual.value.term" title="5.3.1. 実際の値 (Actual Value)" />
+    <link rel="subsection" href="spec.domain.specific.language.html#id2333779" title="5.3.2. 期待する内容 (Expectation (Should or Should Not))" />
+    <link rel="subsection" href="spec.domain.specific.language.html#id1379568" title="5.3.3. 条件 (Matcher)" />
+  </head>
+  <body>
+    <div class="navheader">
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">5.3. スペック用のドメイン特化言語 (DSL)</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="before.writing.code.specify.its.required.behaviour.html">前のページ</a> </td>
+          <th width="60%" align="center">第5章 PHPSpec でのスペックの記述</th>
+          <td width="20%" align="right"> <a accesskey="n" href="execution.methods.for.phpspec.html">次のページ</a></td>
+        </tr>
+      </table>
+    </div>
+    <div class="section" lang="ja" xml:lang="ja">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="spec.domain.specific.language"></a>5.3. スペック用のドメイン特化言語 (DSL)</h2>
+          </div>
+        </div>
+      </div>
+      <p>
+      <a id="id2334439" class="indexterm"></a>
+      PHPSpec では、振る舞いを表すサンプルを書く際に専用のドメイン特化言語
+      (DSL) を使用します。この DSL はできるだけ自然な
+      (かつ文法的に正しい) 英語に近い形式で書けるように作られており、
+      直感的に使用することができます。また、読んで理解するのも簡単になります。
+    </p>
+      <p>
+      DSL の基本的な形式は、Expectation (should あるいは
+      should not) と Matcher (be, beAnInstanceOf, equal, etc.)
+      を用意して、それを新規スペックに渡した値やオブジェクトに関連づけるというものです。
+      こうすることで、比較的読みやすい文章ができあがります。
+      ほんの少し手を加えるだけで、普通の英語 (あるいはその他の言語!) に変換することができます。
+      変換の手間が最小限であること、そして私たちが実際に頭で考える内容に近いこと
+      などから、スペックの内容をレビューしたり修正したりするのも常に簡単です。
+    </p>
+      <div class="example">
+        <a id="id571760"></a>
+        <p class="title">
+          <b>例 5.5. スペック DSL の例: Bowling は Logger のインスタンスであってはならない</b>
+        </p>
+        <div class="example-contents">
+          <pre class="programlisting">$bowling = new Bowling;
+$this-&gt;spec($bowling)-&gt;shouldNot-&gt;beAnInstanceOf('Logger');</pre>
+        </div>
+      </div>
+      <br class="example-break" />
+      <div class="section" lang="ja" xml:lang="ja">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="actual.value.term"></a>5.3.1. 実際の値 (Actual Value)</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+        PHPSpec のサンプルメソッドで DSL のインスタンスを作成するには、
+        <code class="classname">PHPSpec_Context::spec()</code> を使用します。
+        このメソッドには、次の 3 種類のパラメータを渡すことができます。
+      </p>
+        <div class="orderedlist">
+          <ol type="1">
+            <li>
+              <p>スカラー値 (文字列、整数値、論理値、浮動小数点数値、あるいは配列)</p>
+            </li>
+            <li>
+              <p>オブジェクト</p>
+            </li>
+            <li>
+              <p>オブジェクトの名前とコンストラクタへのパラメータ</p>
+            </li>
+          </ol>
+        </div>
+        <div class="example">
+          <a id="id1407190"></a>
+          <p class="title">
+            <b>例 5.6. Actual Term: スカラーの例</b>
+          </p>
+          <div class="example-contents">
+            <pre class="programlisting">$this-&gt;spec('i am a string')-&gt;should-beString();
+$this-&gt;spec(567)-&gt;should-&gt;equal(567);
+$this-&gt;spec(array(1, 2, 3))-&gt;shouldNot-&gt;beEmpty();</pre>
+          </div>
+        </div>
+        <br class="example-break" />
+        <div class="example">
+          <a id="id2334688"></a>
+          <p class="title">
+            <b>例 5.7. Actual Term: オブジェクトの例</b>
+          </p>
+          <div class="example-contents">
+            <pre class="programlisting">$this-&gt;spec(new Bowling)-&gt;should-&gt;beAnInstanceOf('Bowling');
+
+$bowling = new Bowling;
+$this-&gt;spec($bowling)-&gt;shouldNot-&gt;havePlayers();</pre>
+          </div>
+        </div>
+        <br class="example-break" />
+        <div class="example">
+          <a id="id2334409"></a>
+          <p class="title">
+            <b>例 5.8. Actual Term: オブジェクト名とコンストラクタのパラメータの例</b>
+          </p>
+          <div class="example-contents">
+            <pre class="programlisting">$this-&gt;spec('Bowling', new Player('Joe'), new Player('Jim'))-&gt;should-&gt;havePlayers();</pre>
+          </div>
+        </div>
+        <br class="example-break" />
+      </div>
+      <div class="section" lang="ja" xml:lang="ja">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="id2333779"></a>5.3.2. 期待する内容 (Expectation (Should or Should Not))</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+        英語と同様、あらゆる期待は大きく二つに分類できます。
+        失敗することを期待するものと、成功することを期待するものです。
+        実際の値が一致してほしいのか一致してほしくないのかに応じて、
+        DSL で <code class="classname">should</code> あるいは
+        <code class="classname">shouldNot</code> のいずれかを使用します。
+      </p>
+        <p>以下のサンプルは、どれも成功するはずです。</p>
+        <div class="example">
+          <a id="id2330614"></a>
+          <p class="title">
+            <b>例 5.9. Expectation Term: さまざまなサンプル</b>
+          </p>
+          <div class="example-contents">
+            <pre class="programlisting">$spec-&gt;( array() )-&gt;should-&gt;beEmpty();
+$spec-&gt;('Bowling')-&gt;shouldNot-&gt;havePlayers();
+$spec-&gt;('i am a string')-&gt;should-&gt;match("/^[a-z ]$/");
+$spec-&gt;(is_int('string'))-&gt;shouldNot-&gt;beTrue();</pre>
+          </div>
+        </div>
+        <br class="example-break" />
+      </div>
+      <div class="section" lang="ja" xml:lang="ja">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="id1379568"></a>5.3.3. 条件 (Matcher)</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+        ユニットテストのフレームワークがアサーション (表明) に頼っているのに対して、
+        PHPSpec は期待 (Expectation Term) と条件 (Matcher) に責任を分担させています。
+        Matcher はシンプルなオブジェクトで、実際の値と期待内容を
+        DSL のメソッドで比較します。そしてマッチしたか否かを返します。
+        Matcher の形式は <code class="classname">PHPSpec_Matcher_Interface</code>
+        インターフェイスで定義されているので、独自の Matchers
+        を書くこともできます (現在この機能は未完成です)。
+      </p>
+        <p>
+        PHPSpec フレームワークには、すでにさまざまな Matcher
+        が用意されています [注意: 中にはまだ開発途中のものもあります]。
+      </p>
+        <p>
+        Matcher とは、一般にスペックの最後に追加されるものです。
+        先ほどごらんいただいた例でもそのようになっています。
+      </p>
+        <div class="section" lang="ja" xml:lang="ja">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="id2335329"></a>5.3.3.1. PHPSpec に含まれる Matcher</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+          すべての Matcher は、boolean 値を返します。
+          したがって、スペックを記述する「流れるようなインターフェイス」
+          においては一番最後にコールすることになります。
+          <code class="classname">NULL</code> とされているパラメータは、
+          通常は不要であることを意味します
+          (Matcher の名前から、期待する内容は暗黙のうちに決まります)。
+       </p>
+          <div class="table">
+            <a id="id1408679"></a>
+            <p class="title">
+              <b>表 5.1. PHPSpec の Matcher</b>
+            </p>
+            <div class="table-contents">
+              <table summary="PHPSpec の Matcher" border="1">
+                <colgroup>
+                  <col />
+                  <col />
+                </colgroup>
+                <thead>
+                  <tr>
+                    <th align="center">Matcher メソッド</th>
+                    <th align="center">説明</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      <p>
+                        <code class="classname">bool be (mixed
+                $expected)</code>
+                      </p>
+                    </td>
+                    <td>
+                  <code class="classname">equal()</code> と同じ意味で、
+                  英語っぽく書くために用意されています。
+                </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <code class="classname">bool beEqualTo (mixed
+                $expected)</code>
+                    </td>
+                    <td>
+                  <code class="classname">equal()</code> と同じ意味で、
+                  英語っぽく書くために用意されています。
+                </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <code class="classname">bool equal (mixed
+                $expected)</code>
+                    </td>
+                    <td>
+                  期待する内容と等しいかどうかを調べます。
+                  スカラー値、オブジェクトのクラス、配列の内容など、
+                  種類に応じて適切な比較を行います。
+                </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <code class="classname">bool beTrue (null
+                $expected)</code>
+                    </td>
+                    <td>
+                  実際の値を <code class="classname">TRUE</code> と比較します。
+                </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <code class="classname">bool beFalse (null
+                $expected)</code>
+                    </td>
+                    <td>
+                  実際の値を <code class="classname">FALSE</code> と比較します。
+                </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <code class="classname">bool beNull (null
+                $expected)</code>
+                    </td>
+                    <td>
+                  実際の値が <code class="classname">NULL</code> かどうかを調べます。
+                </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <code class="classname">bool beEmpty (mixed
+                $expected)</code>
+                    </td>
+                    <td>
+                  実際の値が空かどうかを調べます (<code class="classname">empty()</code> を使用します)。
+                </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <p>
+                        <code class="classname">bool beSet (null
+                $expected)</code>
+                      </p>
+                    </td>
+                    <td>
+                  実際の値が設定されているかどうかを調べます (<code class="classname">isset()</code>
+                  を使用します)。
+                </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <p>
+                        <code class="classname">bool beAnInstanceOf (string
+                $expected)</code>
+                      </p>
+                    </td>
+                    <td>
+                  実際の値がオブジェクトであり、かつ指定したクラスのインスタンスであるかどうかを調べます。
+                </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <p>
+                        <code class="classname">bool beOfType (string
+                $expected)</code>
+                      </p>
+                    </td>
+                    <td>
+                  実際の値の型が、文字列で指定した型 ('int'、'stdClass' など)
+                  と一致するかどうかを調べます。
+                </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <p>
+                        <code class="classname">bool beInt (null
+                $expected)</code>
+                      </p>
+                    </td>
+                    <td>
+                  実際の値が整数値かどうかを調べます。
+                  厳格なチェックを行うので、数値形式の文字列は整数値と見なされません。
+                </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <p>
+                        <code class="classname">bool beArray (null
+                $expected)</code>
+                      </p>
+                    </td>
+                    <td>実際の値が配列かどうかを調べます。</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <p>
+                        <code class="classname">bool beString (null
+                $expected)</code>
+                      </p>
+                    </td>
+                    <td>実際の値が文字列かどうかを調べます。</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <p>
+                        <code class="classname">bool beFloat (null
+                $expected)</code>
+                      </p>
+                    </td>
+                    <td>実際の値が浮動小数点数値かどうかを調べます。</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <p>
+                        <code class="classname">bool beObject (null
+                $expected)</code>
+                      </p>
+                    </td>
+                    <td>
+                  実際の値がオブジェクトかどうかを調べます。
+                  どのようなクラスのオブジェクトなのかは調べません。
+                </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <p>
+                        <code class="classname">bool beGreaterThan (mixed
+                $expected)</code>
+                      </p>
+                    </td>
+                    <td>
+                  実際の値が指定した値より大きい
+                  (<code class="classname">&gt;</code>) かどうかを調べます。
+                </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <p>
+                        <code class="classname">bool beLessThan (mixed
+                $expected)</code>
+                      </p>
+                    </td>
+                    <td>
+                  実際の値が指定した値より小さい
+                  (<code class="classname">&lt;</code>) かどうかを調べます。
+                </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <p>
+                        <code class="classname">bool beGreaterThanOrEqualTo (mixed
+                $expected)</code>
+                      </p>
+                    </td>
+                    <td>
+                  実際の値が指定した値以上
+                  (<code class="classname">&gt;=</code>) かどうかを調べます。
+                </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <p>
+                        <code class="classname">bool beLessThanOrEqualTo (mixed
+                $expected)</code>
+                      </p>
+                    </td>
+                    <td>
+                  実際の値が指定した値以下
+                  (<code class="classname">&lt;=</code>) かどうかを調べます。
+                </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <br class="table-break" />
+        </div>
+        <div class="section" lang="ja" xml:lang="ja">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="predicate.matchers"></a>5.3.3.2. 叙述型の Matcher (Predicate Matchers)</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+          叙述型の Matcher
+          <a id="id1395756" class="indexterm"></a>
+          とは、指定したオブジェクトから実際の値を取得する Matcher です。
+          オブジェクトを調べ、<code class="classname">isSomething()</code>
+          あるいは <code class="classname">hasSomething()</code>
+          形式のメソッドをコールします。
+          すでに先ほどの DSL の例でこれを使用しており、
+          DSL のメソッド <code class="classname">havePlayers()</code>
+          は <code class="classname">Bowling::hasPlayers()</code>
+          メソッドをコールします。コールしたメソッドの戻り値である boolean
+          値が <code class="classname">TRUE</code> かどうかを調べ、
+          その結果を返します。
+        </p>
+          <div class="example">
+            <a id="id2339207"></a>
+            <p class="title">
+              <b>例 5.10. クラスと叙述型の Matcher のコール例</b>
+            </p>
+            <div class="example-contents">
+              <pre class="programlisting">class Insect { // Insect ... 昆虫
+
+    public function isInsect() { // ……は昆虫です
+        return true;
+    }
+
+    public function hasWings() { // ……は羽根を持っています
+        return true;
+    }
+
+}
+
+class Flea extends Insect { // Flea ... ノミ
+
+    public function hasWings() {
+        return false; // ノミには羽根がありません
+    }
+
+}
+
+class DescribeFlea extends PHPSpec_Context {
+
+    public function itShouldBeAnInsect()
+    {
+        $flee = new Flea;
+        $this-&gt;spec($flea)-&gt;should-&gt;beAnInsect(); // Flea::isInsect() == TRUE
+    }
+
+    public function itShouldHaveNoWings()
+    {
+        $flee = new Flea;
+        $this-&gt;spec($flea)-&gt;shouldNot-&gt;haveWings(); // Flea::hasWings() == FALSE
+    }
+}</pre>
+            </div>
+          </div>
+          <br class="example-break" />
+          <p>
+          叙述型の Matcher メソッドとして、DSL 内では
+          <code class="classname">be()</code>、<code class="classname">beA()</code>、
+          <code class="classname">beAn()</code> 形式を使用することができます。
+          これらはそれぞれ文法的に正しくなるように区別されているだけであり、
+          それ以外はまったく同じです。<code class="classname">have(), haveA() および haveAn()</code>
+          も同様です。同じような規則でオブジェクトのメソッドを探します
+          (オブジェクトのメソッド名が文法的に正しいものである必要があります!)。
+          将来的には、他の形式にもこのような叙述型を取り入れる予定です。
+          何かよい案があれば、ぜひ教えてください。
+        </p>
+        </div>
+      </div>
+    </div>
+    <div class="navfooter">
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="before.writing.code.specify.its.required.behaviour.html">前のページ</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="writing.specs.with.phpspec.html">上に戻る</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="execution.methods.for.phpspec.html">次のページ</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">5.2. コードを書く前に、まずは要求される振る舞いを定義する </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">ホーム</a>
+          </td>
+          <td width="40%" align="right" valign="top"> 第6章 PHPSpec の実行方法</td>
+        </tr>
+      </table>
+    </div>
+    <div xmlns="" class="revinfo"></div>
+  </body>
+</html>

@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Chapter 6. Execution Methods for PHPSpec</title>
+    <link rel="stylesheet" href="style.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="PHPSpec Reference Manual" />
+    <link rel="up" href="index.html" title="PHPSpec Reference Manual" />
+    <link rel="prev" href="spec.domain.specific.language.html" title="5.3. The Spec Domain Specific Language (DSL)" />
+    <link rel="next" href="the.http.runner.html" title="6.2. The HTTP Runner" />
+    <link rel="preface" href="preface.html" title="Preface" />
+    <link rel="chapter" href="installing.phpspec.html" title="Chapter 1. Installing PHPSpec" />
+    <link rel="chapter" href="getting.started.html" title="Chapter 2. Getting Started" />
+    <link rel="chapter" href="introduction.html" title="Chapter 3. Introduction" />
+    <link rel="chapter" href="phpspecs.goals.html" title="Chapter 4. PHPSpec's Goals" />
+    <link rel="chapter" href="writing.specs.with.phpspec.html" title="Chapter 5. Writing Specs with PHPSpec" />
+    <link rel="chapter" href="execution.methods.for.phpspec.html" title="Chapter 6. Execution Methods for PHPSpec" />
+    <link rel="appendix" href="copyrights.html" title="Appendix A. Copyright Information" />
+    <link rel="index" href="the.index.html" title="Index" />
+    <link rel="section" href="execution.methods.for.phpspec.html#the.console.runner" title="6.1. The Console Runner" />
+    <link rel="section" href="the.http.runner.html" title="6.2. The HTTP Runner" />
+  </head>
+  <body>
+    <div class="navheader">
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">Chapter 6. Execution Methods for PHPSpec</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="spec.domain.specific.language.html">Prev</a> </td>
+          <th width="60%" align="center"> </th>
+          <td width="20%" align="right"> <a accesskey="n" href="the.http.runner.html">Next</a></td>
+        </tr>
+      </table>
+    </div>
+    <div class="chapter" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title"><a id="execution.methods.for.phpspec"></a>Chapter 6. Execution Methods for PHPSpec</h2>
+          </div>
+        </div>
+      </div>
+      <div class="toc">
+        <p>
+          <b>Table of Contents</b>
+        </p>
+        <dl>
+          <dt>
+            <span class="section">
+              <a href="execution.methods.for.phpspec.html#the.console.runner">6.1. The Console Runner</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="section">
+              <a href="the.http.runner.html">6.2. The HTTP Runner</a>
+            </span>
+          </dt>
+        </dl>
+      </div>
+      <p>PHPSpec offers two distinct modes for executing specs or examples. The
+  method most used throughout this manual requires using the command line
+  <code class="classname">phpspec</code> operation from a console like bash or MS-DOS.
+  An alternative method is available for executing specs by opening a .php URL
+  in your preferred web browser. This alternative can output in either plain
+  text or HTML as determined by various options.</p>
+      <div class="section" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h2 class="title" style="clear: both"><a id="the.console.runner"></a>6.1. The Console Runner</h2>
+            </div>
+          </div>
+        </div>
+        <p>Using PHPSpec from the console is the default option which requires
+    no additional work from your perspective. Simple write your specs,
+    navigate to their location on the command line, and issue a command
+    like:</p>
+        <pre class="screen">phpspec --recursive</pre>
+        <p>This simple command recursively scans the current directory, and all
+    child directories, for spec files and executes all the examples each spec
+    file contains. The simplicity of this method makes using the console the
+    most obvious choice. If you're using a Unix console then you even get some
+    coloured output!</p>
+        <p>The <code class="classname">phpspec</code> console command has a number of
+    useful options which will be expanded substantially as development of
+    subsequent versions progresses. Each option usually has both a full length
+    version, and a shorter single character version. A table of the currently
+    available options is presented below.</p>
+        <div class="table">
+          <a id="id572699"></a>
+          <p class="title">
+            <b>Table 6.1. PHPSpec Console Options</b>
+          </p>
+          <div class="table-contents">
+            <table summary="PHPSpec Console Options" border="1">
+              <colgroup>
+                <col />
+                <col />
+                <col />
+              </colgroup>
+              <thead>
+                <tr>
+                  <th align="center">Fulltext Variant</th>
+                  <th align="center">Single Character Variant</th>
+                  <th align="center">Explanation</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>--recursive</td>
+                  <td>-r</td>
+                  <td>Recursively search the current directory and all child
+            directories for specs, and execute all spec files and their
+            examples as found.</td>
+                </tr>
+                <tr>
+                  <td>--reporter=[html/console/text]</td>
+                  <td>
+                    <span class="emphasis">
+                      <em>None</em>
+                    </span>
+                  </td>
+                  <td>Use one of the available reporters to format output as
+            either HTML, Text, or standard Console output. The default depends
+            on the scenario but always defaults to Console when PHPSpec is run
+            from the command line.</td>
+                </tr>
+                <tr>
+                  <td>--specdoc</td>
+                  <td>-s</td>
+                  <td>Add specdoc output (i.e. a plain text list of all
+            specifications) to the results output for all reporters.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <br class="table-break" />
+      </div>
+    </div>
+    <div class="navfooter">
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="spec.domain.specific.language.html">Prev</a> </td>
+          <td width="20%" align="center"> </td>
+          <td width="40%" align="right"> <a accesskey="n" href="the.http.runner.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">5.3. The Spec Domain Specific Language (DSL) </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> 6.2. The HTTP Runner</td>
+        </tr>
+      </table>
+    </div>
+    <div xmlns="" class="revinfo"></div>
+  </body>
+</html>

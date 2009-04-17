@@ -1,0 +1,362 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>PHPSpec リファレンスマニュアル</title>
+    <link rel="stylesheet" href="style.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="PHPSpec リファレンスマニュアル" />
+    <link rel="next" href="preface.html" title="序文" />
+    <link rel="preface" href="preface.html" title="序文" />
+    <link rel="chapter" href="installing.phpspec.html" title="第1章 PHPSpec のインストール" />
+    <link rel="chapter" href="getting.started.html" title="第2章 さぁはじめましょう" />
+    <link rel="chapter" href="introduction.html" title="第3章 導入" />
+    <link rel="chapter" href="phpspecs.goals.html" title="第4章 PHPSpec の目標" />
+    <link rel="chapter" href="writing.specs.with.phpspec.html" title="第5章 PHPSpec でのスペックの記述" />
+    <link rel="chapter" href="execution.methods.for.phpspec.html" title="第6章 PHPSpec の実行方法" />
+    <link rel="appendix" href="copyrights.html" title="付録 A. 著作権について" />
+    <link rel="index" href="the.index.html" title="目次" />
+  </head>
+  <body>
+    <div class="navheader">
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">PHPSpec リファレンスマニュアル</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"> </td>
+          <th width="60%" align="center"> </th>
+          <td width="20%" align="right"> <a accesskey="n" href="preface.html">次のページ</a></td>
+        </tr>
+      </table>
+    </div>
+    <div class="book" lang="ja" xml:lang="ja">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h1 class="title"><a id="manual"></a>PHPSpec リファレンスマニュアル</h1>
+          </div>
+          <div>
+            <h2 class="subtitle">PHP 用の振舞駆動開発フレームワーク</h2>
+          </div>
+          <div>
+            <p class="copyright">製作著作 © 2008 
+                Pádraic Brady
+                (<a class="ulink" href="http://blog.astrumfutura.com" target="_top">http://blog.astrumfutura.com</a>)
+            </p>
+          </div>
+          <div>
+            <div class="legalnotice">
+              <a id="id2347865"></a>
+              <p>
+            This work is licensed under the Creative Commons Attribution 3.0 License. To view a copy of this license, visit <a class="ulink" href="http://creativecommons.org/licenses/by/3.0/" target="_top">http://creativecommons.org/licenses/by/3.0/</a> or send a letter to Creative Commons, 559 Nathan Abbott Way, Stanford, California 94305, USA.
+            </p>
+            </div>
+          </div>
+          <div>
+            <p class="pubdate">2008-01-09</p>
+          </div>
+        </div>
+        <hr />
+      </div>
+      <div class="toc">
+        <p>
+          <b>目次</b>
+        </p>
+        <dl>
+          <dt>
+            <span class="preface">
+              <a href="preface.html">序文</a>
+            </span>
+          </dt>
+          <dd>
+            <dl>
+              <dt>
+                <span class="section">
+                  <a href="preface.html#before.we.get.started">1. はじめる前に</a>
+                </span>
+              </dt>
+              <dd>
+                <dl>
+                  <dt>
+                    <span class="section">
+                      <a href="preface.html#audience">1.1. 対象読者</a>
+                    </span>
+                  </dt>
+                  <dt>
+                    <span class="section">
+                      <a href="preface.html#requirements">1.2. 要件</a>
+                    </span>
+                  </dt>
+                  <dt>
+                    <span class="section">
+                      <a href="preface.html#this.book.is.free">1.3. 本書はフリーです</a>
+                    </span>
+                  </dt>
+                  <dt>
+                    <span class="section">
+                      <a href="preface.html#acknowledgements">1.4. 謝辞</a>
+                    </span>
+                  </dt>
+                </dl>
+              </dd>
+            </dl>
+          </dd>
+          <dt>
+            <span class="chapter">
+              <a href="installing.phpspec.html">1. PHPSpec のインストール</a>
+            </span>
+          </dt>
+          <dd>
+            <dl>
+              <dt>
+                <span class="section">
+                  <a href="installing.phpspec.html#installation">1.1. インストール</a>
+                </span>
+              </dt>
+              <dd>
+                <dl>
+                  <dt>
+                    <span class="section">
+                      <a href="installing.phpspec.html#installing.phpspec.with.pear">1.1.1. PEAR を使用した PHPSpec のインストール</a>
+                    </span>
+                  </dt>
+                  <dt>
+                    <span class="section">
+                      <a href="installing.phpspec.html#id1408974">1.1.2. PEAR パッケージをダウンロードすることによる PHPSpec のインストール</a>
+                    </span>
+                  </dt>
+                  <dt>
+                    <span class="section">
+                      <a href="installing.phpspec.html#installing.phpspec.manually">1.1.3. 手動での PHPSpec のインストール</a>
+                    </span>
+                  </dt>
+                </dl>
+              </dd>
+            </dl>
+          </dd>
+          <dt>
+            <span class="chapter">
+              <a href="getting.started.html">2. さぁはじめましょう</a>
+            </span>
+          </dt>
+          <dd>
+            <dl>
+              <dt>
+                <span class="section">
+                  <a href="getting.started.html#phpspec.getting.started">2.1. さぁはじめましょう</a>
+                </span>
+              </dt>
+              <dd>
+                <dl>
+                  <dt>
+                    <span class="section">
+                      <a href="getting.started.html#what.is.phpspec">2.1.1. PHPSpec とは?</a>
+                    </span>
+                  </dt>
+                  <dt>
+                    <span class="section">
+                      <a href="getting.started.html#you.start.by.writing.a.specification">2.1.2. まずはスペックを書くことから</a>
+                    </span>
+                  </dt>
+                  <dt>
+                    <span class="section">
+                      <a href="getting.started.html#take.very.small.steps">2.1.3. 一歩ずつ着実に</a>
+                    </span>
+                  </dt>
+                </dl>
+              </dd>
+            </dl>
+          </dd>
+          <dt>
+            <span class="chapter">
+              <a href="introduction.html">3. 導入</a>
+            </span>
+          </dt>
+          <dd>
+            <dl>
+              <dt>
+                <span class="section">
+                  <a href="introduction.html#testing.your.code">3.1. コードのテスト</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="section">
+                  <a href="source.code.examples.as.documentation.html">3.2. ドキュメントとしてのソースコードサンプル</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="section">
+                  <a href="writing.examples.specs.before.writing.code.html">3.3. コードの前にまずサンプル (スペック) から</a>
+                </span>
+              </dt>
+              <dd>
+                <dl>
+                  <dt>
+                    <span class="section">
+                      <a href="writing.examples.specs.before.writing.code.html#why.write.examples.first">3.3.1. なぜ先にサンプルから書き始めるの?</a>
+                    </span>
+                  </dt>
+                  <dt>
+                    <span class="section">
+                      <a href="writing.examples.specs.before.writing.code.html#workflow.of.bdd.using.phpspec">3.3.2. PHPSpec を使用した BDD の流れ</a>
+                    </span>
+                  </dt>
+                </dl>
+              </dd>
+              <dt>
+                <span class="section">
+                  <a href="phpspec.and.bdd.in.context.html">3.4. PHPSpec および BDD について</a>
+                </span>
+              </dt>
+            </dl>
+          </dd>
+          <dt>
+            <span class="chapter">
+              <a href="phpspecs.goals.html">4. PHPSpec の目標</a>
+            </span>
+          </dt>
+          <dd>
+            <dl>
+              <dt>
+                <span class="section">
+                  <a href="phpspecs.goals.html#goals">4.1. 目標!</a>
+                </span>
+              </dt>
+            </dl>
+          </dd>
+          <dt>
+            <span class="chapter">
+              <a href="writing.specs.with.phpspec.html">5. PHPSpec でのスペックの記述</a>
+            </span>
+          </dt>
+          <dd>
+            <dl>
+              <dt>
+                <span class="section">
+                  <a href="writing.specs.with.phpspec.html#specs.examples.and.contexts">5.1. スペック、サンプル、そしてコンテキスト</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="section">
+                  <a href="before.writing.code.specify.its.required.behaviour.html">5.2. コードを書く前に、まずは要求される振る舞いを定義する</a>
+                </span>
+              </dt>
+              <dd>
+                <dl>
+                  <dt>
+                    <span class="section">
+                      <a href="before.writing.code.specify.its.required.behaviour.html#explaining.the.phpspec.spec.layout">5.2.1. PHPSpec におけるスペックの配置</a>
+                    </span>
+                  </dt>
+                  <dt>
+                    <span class="section">
+                      <a href="before.writing.code.specify.its.required.behaviour.html#the.code.to.implement.the.new.filesystem.logger.specification">5.2.2. New Filesystem Logger の仕様を実装するコード</a>
+                    </span>
+                  </dt>
+                </dl>
+              </dd>
+              <dt>
+                <span class="section">
+                  <a href="spec.domain.specific.language.html">5.3. スペック用のドメイン特化言語 (DSL)</a>
+                </span>
+              </dt>
+              <dd>
+                <dl>
+                  <dt>
+                    <span class="section">
+                      <a href="spec.domain.specific.language.html#actual.value.term">5.3.1. 実際の値 (Actual Value)</a>
+                    </span>
+                  </dt>
+                  <dt>
+                    <span class="section">
+                      <a href="spec.domain.specific.language.html#id2333779">5.3.2. 期待する内容 (Expectation (Should or Should Not))</a>
+                    </span>
+                  </dt>
+                  <dt>
+                    <span class="section">
+                      <a href="spec.domain.specific.language.html#id1379568">5.3.3. 条件 (Matcher)</a>
+                    </span>
+                  </dt>
+                </dl>
+              </dd>
+            </dl>
+          </dd>
+          <dt>
+            <span class="chapter">
+              <a href="execution.methods.for.phpspec.html">6. PHPSpec の実行方法</a>
+            </span>
+          </dt>
+          <dd>
+            <dl>
+              <dt>
+                <span class="section">
+                  <a href="execution.methods.for.phpspec.html#the.console.runner">6.1. コンソールからの実行</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="section">
+                  <a href="the.http.runner.html">6.2. HTTP 経由の実行</a>
+                </span>
+              </dt>
+            </dl>
+          </dd>
+          <dt>
+            <span class="appendix">
+              <a href="copyrights.html">A. 著作権について</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="index">
+              <a href="the.index.html">目次</a>
+            </span>
+          </dt>
+        </dl>
+      </div>
+      <div class="list-of-tables">
+        <p>
+          <b>表目次</b>
+        </p>
+        <dl>
+          <dt>5.1. <a href="spec.domain.specific.language.html#id1408679">PHPSpec の Matcher</a></dt>
+          <dt>6.1. <a href="execution.methods.for.phpspec.html#id2332152">PHPSpec コマンドのオプション</a></dt>
+        </dl>
+      </div>
+      <div class="list-of-examples">
+        <p>
+          <b>例目次</b>
+        </p>
+        <dl>
+          <dt>3.1. <a href="source.code.examples.as.documentation.html#id2331231">PHPUnit の例</a></dt>
+          <dt>3.2. <a href="source.code.examples.as.documentation.html#id2331253">PHPSpec の例</a></dt>
+          <dt>5.1. <a href="writing.specs.with.phpspec.html#id2335012">PHPSpec のサンプルメソッドで記述したスペック</a></dt>
+          <dt>5.2. <a href="before.writing.code.specify.its.required.behaviour.html#id568116">プレーンテキストで書いた、ファイルシステムロガーのスペック</a></dt>
+          <dt>5.3. <a href="before.writing.code.specify.its.required.behaviour.html#id1395107">New Filesystem Logger コンテキストの仕様</a></dt>
+          <dt>5.4. <a href="before.writing.code.specify.its.required.behaviour.html#id554624">ファイルシステムロガーの実装</a></dt>
+          <dt>5.5. <a href="spec.domain.specific.language.html#id571760">スペック DSL の例: Bowling は Logger のインスタンスであってはならない</a></dt>
+          <dt>5.6. <a href="spec.domain.specific.language.html#id1407190">Actual Term: スカラーの例</a></dt>
+          <dt>5.7. <a href="spec.domain.specific.language.html#id2334688">Actual Term: オブジェクトの例</a></dt>
+          <dt>5.8. <a href="spec.domain.specific.language.html#id2334409">Actual Term: オブジェクト名とコンストラクタのパラメータの例</a></dt>
+          <dt>5.9. <a href="spec.domain.specific.language.html#id2330614">Expectation Term: さまざまなサンプル</a></dt>
+          <dt>5.10. <a href="spec.domain.specific.language.html#id2339207">クラスと叙述型の Matcher のコール例</a></dt>
+        </dl>
+      </div>
+    </div>
+    <div class="navfooter">
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"> </td>
+          <td width="20%" align="center"> </td>
+          <td width="40%" align="right"> <a accesskey="n" href="preface.html">次のページ</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top"> </td>
+          <td width="20%" align="center"> </td>
+          <td width="40%" align="right" valign="top"> 序文</td>
+        </tr>
+      </table>
+    </div>
+    <div xmlns="" class="revinfo"></div>
+  </body>
+</html>

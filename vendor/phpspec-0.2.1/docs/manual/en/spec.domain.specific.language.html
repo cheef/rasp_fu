@@ -1,0 +1,492 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>5.3. The Spec Domain Specific Language (DSL)</title>
+    <link rel="stylesheet" href="style.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="PHPSpec Reference Manual" />
+    <link rel="up" href="writing.specs.with.phpspec.html" title="Chapter 5. Writing Specs with PHPSpec" />
+    <link rel="prev" href="before.writing.code.specify.its.required.behaviour.html" title="5.2. Before Writing Code, Specify Its Required Behaviour" />
+    <link rel="next" href="execution.methods.for.phpspec.html" title="Chapter 6. Execution Methods for PHPSpec" />
+    <link rel="preface" href="preface.html" title="Preface" />
+    <link rel="chapter" href="installing.phpspec.html" title="Chapter 1. Installing PHPSpec" />
+    <link rel="chapter" href="getting.started.html" title="Chapter 2. Getting Started" />
+    <link rel="chapter" href="introduction.html" title="Chapter 3. Introduction" />
+    <link rel="chapter" href="phpspecs.goals.html" title="Chapter 4. PHPSpec's Goals" />
+    <link rel="chapter" href="writing.specs.with.phpspec.html" title="Chapter 5. Writing Specs with PHPSpec" />
+    <link rel="chapter" href="execution.methods.for.phpspec.html" title="Chapter 6. Execution Methods for PHPSpec" />
+    <link rel="appendix" href="copyrights.html" title="Appendix A. Copyright Information" />
+    <link rel="index" href="the.index.html" title="Index" />
+    <link rel="subsection" href="spec.domain.specific.language.html#actual.value.term" title="5.3.1. The Actual Value Term" />
+    <link rel="subsection" href="spec.domain.specific.language.html#id570591" title="5.3.2. The Expectation Term (Should or Should Not)" />
+    <link rel="subsection" href="spec.domain.specific.language.html#id569340" title="5.3.3. The Matcher Term" />
+  </head>
+  <body>
+    <div class="navheader">
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">5.3. The Spec Domain Specific Language (DSL)</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="before.writing.code.specify.its.required.behaviour.html">Prev</a> </td>
+          <th width="60%" align="center">Chapter 5. Writing Specs with PHPSpec</th>
+          <td width="20%" align="right"> <a accesskey="n" href="execution.methods.for.phpspec.html">Next</a></td>
+        </tr>
+      </table>
+    </div>
+    <div class="section" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="spec.domain.specific.language"></a>5.3. The Spec Domain Specific Language (DSL)</h2>
+          </div>
+        </div>
+      </div>
+      <p><a id="id570093" class="indexterm"></a>PHPSpec writes coded Examples of behaviour using a Domain
+    Specific Language (DSL) for describing expectations. The DSL was designed
+    to approximate plain grammatically accurate English so it is intuitive to
+    use, read and comprehend.</p>
+      <p>The basic form of the DSL is to attach an Expectation (should or
+    should not) and a Matcher (be, beAnInstanceOf, equal, etc.) to the value
+    or object passed to a new Spec. This approach leads to a relatively easy
+    to read sentance requiring minimal translation into the plain English (or
+    other language!) we normally think in. Since the translation effort is
+    minimised, and is closer to how we really think, it's invariably easy to
+    review, critique and modify.</p>
+      <div class="example">
+        <a id="id570325"></a>
+        <p class="title">
+          <b>Example 5.5. Example Spec DSL: Bowling should not be an instance of
+      Logger</b>
+        </p>
+        <div class="example-contents">
+          <pre class="programlisting">$bowling = new Bowling;
+$this-&gt;spec($bowling)-&gt;shouldNot-&gt;beAnInstanceOf('Logger');</pre>
+        </div>
+      </div>
+      <br class="example-break" />
+      <div class="section" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="actual.value.term"></a>5.3.1. The Actual Value Term</h3>
+            </div>
+          </div>
+        </div>
+        <p>In a PHPSpec Example method block, the DSL is instantiated using a
+      call to the <code class="classname">PHPSpec_Context::spec()</code>. This accepts
+      three possible parameter groupings.</p>
+        <div class="orderedlist">
+          <ol type="1">
+            <li>
+              <p>A scalar value, i.e. string, integer, boolean, float, or
+          array</p>
+            </li>
+            <li>
+              <p>An object</p>
+            </li>
+            <li>
+              <p>An object name, together with any constructor
+          parameters</p>
+            </li>
+          </ol>
+        </div>
+        <div class="example">
+          <a id="id571849"></a>
+          <p class="title">
+            <b>Example 5.6. Actual Term: Scalar Examples</b>
+          </p>
+          <div class="example-contents">
+            <pre class="programlisting">$this-&gt;spec('i am a string')-&gt;should-beString();
+$this-&gt;spec(567)-&gt;should-&gt;equal(567);
+$this-&gt;spec(array(1, 2, 3))-&gt;shouldNot-&gt;beEmpty();</pre>
+          </div>
+        </div>
+        <br class="example-break" />
+        <div class="example">
+          <a id="id570345"></a>
+          <p class="title">
+            <b>Example 5.7. Actual Term: Object Examples</b>
+          </p>
+          <div class="example-contents">
+            <pre class="programlisting">$this-&gt;spec(new Bowling)-&gt;should-&gt;beAnInstanceOf('Bowling');
+
+$bowling = new Bowling;
+$this-&gt;spec($bowling)-&gt;shouldNot-&gt;havePlayers();</pre>
+          </div>
+        </div>
+        <br class="example-break" />
+        <div class="example">
+          <a id="id570282"></a>
+          <p class="title">
+            <b>Example 5.8. Actual Term: Object Name With Constructor Params</b>
+          </p>
+          <div class="example-contents">
+            <pre class="programlisting">$this-&gt;spec('Bowling', new Player('Joe'), new Player('Jim'))-&gt;should-&gt;havePlayers();</pre>
+          </div>
+        </div>
+        <br class="example-break" />
+      </div>
+      <div class="section" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="id570591"></a>5.3.2. The Expectation Term (Should or Should Not)</h3>
+            </div>
+          </div>
+        </div>
+        <p>Just as with English, all expectations fall into one of two
+      possible classes. Those you expect to fail, and those you expect to
+      pass. Whether you wish a Matched Actual Value or an Unmatched Actual
+      Value to be interpreted as a pass depends on the use of the DSL
+      <code class="classname">should</code> or <code class="classname">shouldNot</code>
+      phrases.</p>
+        <p>All the examples below are expected to pass.</p>
+        <div class="example">
+          <a id="id571872"></a>
+          <p class="title">
+            <b>Example 5.9. Expectation Term: Various Passing Examples</b>
+          </p>
+          <div class="example-contents">
+            <pre class="programlisting">$spec-&gt;( array() )-&gt;should-&gt;beEmpty();
+$spec-&gt;('Bowling')-&gt;shouldNot-&gt;havePlayers();
+$spec-&gt;('i am a string')-&gt;should-&gt;match("/^[a-z ]$/");
+$spec-&gt;(is_int('string'))-&gt;shouldNot-&gt;beTrue();</pre>
+          </div>
+        </div>
+        <br class="example-break" />
+      </div>
+      <div class="section" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="id569340"></a>5.3.3. The Matcher Term</h3>
+            </div>
+          </div>
+        </div>
+        <p>Whereas Unit Testing frameworks rely on assertions, PHPSpec splits
+      the responsibility between an Expectation Term and a Matcher. A Matcher
+      is a simple object which compares an Actual Value Term with the expected
+      value passed to the Matcher method in the DSL for a positive or negative
+      match. The form of a Matcher is ruled by the
+      <code class="classname">PHPSpec_Matcher_Interface</code> interface so you can
+      write custom Matchers (pending feature).</p>
+        <p>An already expansive range of Matchers are provided by the PHPSpec
+      framework. [Note: Some are still awaiting development.]</p>
+        <p>A Matcher is general appended as the last term to a Spec as
+      demonstrated in earlier examples.</p>
+        <div class="section" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="id569939"></a>5.3.3.1. Matchers Included In PHPSpec</h4>
+              </div>
+            </div>
+          </div>
+          <p>Note that all Matchers will return a boolean when called thus
+        ending the fluent interface of the Spec. Parameters marked
+        <code class="classname">NULL</code> generally mean a parameter is not required
+        (the expected value is implicit in the Matcher name).</p>
+          <div class="table">
+            <a id="id572197"></a>
+            <p class="title">
+              <b>Table 5.1. PHPSpec Matchers</b>
+            </p>
+            <div class="table-contents">
+              <table summary="PHPSpec Matchers" border="1">
+                <colgroup>
+                  <col />
+                  <col />
+                </colgroup>
+                <thead>
+                  <tr>
+                    <th align="center">Matcher Method</th>
+                    <th align="center">Explanation</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      <p>
+                        <code class="classname">bool be (mixed
+                $expected)</code>
+                      </p>
+                    </td>
+                    <td>Identical to using <code class="classname">equal()</code> and
+                reflects general English usage.</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <code class="classname">bool beEqualTo (mixed
+                $expected)</code>
+                    </td>
+                    <td>Identical to using <code class="classname">equal()</code> and
+                reflects general English usage.</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <code class="classname">bool equal (mixed
+                $expected)</code>
+                    </td>
+                    <td>Attempts to match the expected value on an equal basis
+                intelligently comparing scalar values, object class, array
+                content, or other metrics generally associated with two items
+                being equivelant.</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <code class="classname">bool beTrue (null
+                $expected)</code>
+                    </td>
+                    <td>Matches the actual value against
+                <code class="classname">TRUE</code>.</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <code class="classname">bool beFalse (null
+                $expected)</code>
+                    </td>
+                    <td>Matches the actual value against
+                <code class="classname">FALSE</code>.</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <code class="classname">bool beNull (null
+                $expected)</code>
+                    </td>
+                    <td>Checks if the actual value is
+                <code class="classname">NULL</code>.</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <code class="classname">bool beEmpty (mixed
+                $expected)</code>
+                    </td>
+                    <td>Checks if the actual value is empty (using
+                <code class="classname">empty()</code>).</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <p>
+                        <code class="classname">bool beSet (null
+                $expected)</code>
+                      </p>
+                    </td>
+                    <td>Checks if the actual value is set (using
+                <code class="classname">isset()</code>).</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <p>
+                        <code class="classname">bool beAnInstanceOf (string
+                $expected)</code>
+                      </p>
+                    </td>
+                    <td>Determines if the actual value is both an object and an
+                instance of the class type provided.</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <p>
+                        <code class="classname">bool beOfType (string
+                $expected)</code>
+                      </p>
+                    </td>
+                    <td>Checks the value type accepting a string decription of
+                the expected type (e.g. 'int', 'stdClass').</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <p>
+                        <code class="classname">bool beInt (null
+                $expected)</code>
+                      </p>
+                    </td>
+                    <td>Checks if the actual value is an integer. This is a
+                precise check - the string form of an integer will not
+                match.</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <p>
+                        <code class="classname">bool beArray (null
+                $expected)</code>
+                      </p>
+                    </td>
+                    <td>Checks if the actual value is an array.</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <p>
+                        <code class="classname">bool beString (null
+                $expected)</code>
+                      </p>
+                    </td>
+                    <td>Checks if the actual value is a string.</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <p>
+                        <code class="classname">bool beFloat (null
+                $expected)</code>
+                      </p>
+                    </td>
+                    <td>Checks if the actual value is a float.</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <p>
+                        <code class="classname">bool beObject (null
+                $expected)</code>
+                      </p>
+                    </td>
+                    <td>Checks if the actual value is an object; does not
+                perform type comparison on class type.</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <p>
+                        <code class="classname">bool beGreaterThan (mixed
+                $expected)</code>
+                      </p>
+                    </td>
+                    <td>Checks if the actual value is greater than
+                (<code class="classname">&gt;</code>) the expected value
+                provided.</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <p>
+                        <code class="classname">bool beLessThan (mixed
+                $expected)</code>
+                      </p>
+                    </td>
+                    <td>Checks if the actual value is less than
+                (<code class="classname">&lt;</code>) the expected value
+                provided</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <p>
+                        <code class="classname">bool beGreaterThanOrEqualTo (mixed
+                $expected)</code>
+                      </p>
+                    </td>
+                    <td>Checks if the actual value is greater than or equal to
+                (<code class="classname">&gt;=</code>) the expected value
+                provided</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <p>
+                        <code class="classname">bool beLessThanOrEqualTo (mixed
+                $expected)</code>
+                      </p>
+                    </td>
+                    <td>Checks if the actual value is less than or equal to
+                (<code class="classname">&lt;=</code>) the expected value
+                provided</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <br class="table-break" />
+        </div>
+        <div class="section" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="predicate.matchers"></a>5.3.3.2. Predicate Matchers</h4>
+              </div>
+            </div>
+          </div>
+          <p>A Predicate Matcher<a id="id572261" class="indexterm"></a> is a Matcher which captures it's actual value from an
+        object being specified. It does so by seeking and then calling a
+        method of the form <code class="classname">isSomething()</code> or
+        <code class="classname">hasSomething()</code>. We saw this already in previous
+        DSL examples where the DSL method <code class="classname">havePlayers()</code>
+        is translated into a call to
+        <code class="classname">Bowling::hasPlayers()</code>. A boolean result from
+        the called method is then compared to a boolean
+        <code class="classname">TRUE</code> to check for a positive or negative
+        match.</p>
+          <div class="example">
+            <a id="id572818"></a>
+            <p class="title">
+              <b>Example 5.10. Example of Classes and Predicate Matcher Calls</b>
+            </p>
+            <div class="example-contents">
+              <pre class="programlisting">class Insect {
+
+    public function isInsect() {
+        return true;
+    }
+
+    public function hasWings() {
+        return true;
+    }
+
+}
+
+class Flea extends Insect {
+
+    public function hasWings() {
+        return false; // Fleas are wingless blood sucking things
+    }
+
+}
+
+class DescribeFlea extends PHPSpec_Context {
+
+    public function itShouldBeAnInsect()
+    {
+        $flee = new Flea;
+        $this-&gt;spec($flea)-&gt;should-&gt;beAnInsect(); // Flea::isInsect() == TRUE
+    }
+
+    public function itShouldHaveNoWings()
+    {
+        $flee = new Flea;
+        $this-&gt;spec($flea)-&gt;shouldNot-&gt;haveWings(); // Flea::hasWings() == FALSE
+    }
+}</pre>
+            </div>
+          </div>
+          <br class="example-break" />
+          <p>Predicate Matcher methods in the DSL allow for the use of
+        <code class="classname">be()</code>, <code class="classname">beA()</code>,
+        <code class="classname">beAn()</code> variations which are primarily for
+        allowing grammatically correct structures and are otherwise identical.
+        Same applies to <code class="classname">have(), haveA(), and haveAn()</code>.
+        The same variations are also searched for when matching to an object's
+        methods (even object methods can be grammatically correct!). This form
+        of matching will eventually be expanded to allow for other predicate
+        style calling methods. If you have any suggestions be sure to let us
+        know.</p>
+        </div>
+      </div>
+    </div>
+    <div class="navfooter">
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="before.writing.code.specify.its.required.behaviour.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="writing.specs.with.phpspec.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="execution.methods.for.phpspec.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">5.2. Before Writing Code, Specify Its Required Behaviour </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> Chapter 6. Execution Methods for PHPSpec</td>
+        </tr>
+      </table>
+    </div>
+    <div xmlns="" class="revinfo"></div>
+  </body>
+</html>

@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>3.2. ドキュメントとしてのソースコードサンプル</title>
+    <link rel="stylesheet" href="style.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="PHPSpec リファレンスマニュアル" />
+    <link rel="up" href="introduction.html" title="第3章 導入" />
+    <link rel="prev" href="introduction.html" title="第3章 導入" />
+    <link rel="next" href="writing.examples.specs.before.writing.code.html" title="3.3. コードの前にまずサンプル (スペック) から" />
+    <link rel="preface" href="preface.html" title="序文" />
+    <link rel="chapter" href="installing.phpspec.html" title="第1章 PHPSpec のインストール" />
+    <link rel="chapter" href="getting.started.html" title="第2章 さぁはじめましょう" />
+    <link rel="chapter" href="introduction.html" title="第3章 導入" />
+    <link rel="chapter" href="phpspecs.goals.html" title="第4章 PHPSpec の目標" />
+    <link rel="chapter" href="writing.specs.with.phpspec.html" title="第5章 PHPSpec でのスペックの記述" />
+    <link rel="chapter" href="execution.methods.for.phpspec.html" title="第6章 PHPSpec の実行方法" />
+    <link rel="appendix" href="copyrights.html" title="付録 A. 著作権について" />
+    <link rel="index" href="the.index.html" title="目次" />
+  </head>
+  <body>
+    <div class="navheader">
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">3.2. ドキュメントとしてのソースコードサンプル</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="introduction.html">前のページ</a> </td>
+          <th width="60%" align="center">第3章 導入</th>
+          <td width="20%" align="right"> <a accesskey="n" href="writing.examples.specs.before.writing.code.html">次のページ</a></td>
+        </tr>
+      </table>
+    </div>
+    <div class="section" lang="ja" xml:lang="ja">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="source.code.examples.as.documentation"></a>3.2. ドキュメントとしてのソースコードサンプル</h2>
+          </div>
+        </div>
+      </div>
+      <p>
+      繰り返し可能なテストはそれだけでも十分よくできていますが、
+      別の目的にも使うことができます。
+      一枚の絵が何千もの言葉より雄弁なことがあります。
+      プログラミングにおいても、
+      コードの使用法を示すよいサンプルがあれば
+      それは何千もの言葉に匹敵するものとなるでしょう
+      <a id="id1566697" class="indexterm"></a>。
+      繰り返し可能なサンプルは機能テストとしても優れていますが、
+      ユーザや他のプログラマに対してソースコードの正しい使用法を示すという意味合いもあります。
+    </p>
+      <p>
+      ここで、いわゆるユニットテスト
+      <a id="id1757825" class="indexterm"></a> やテスト駆動開発<a id="id1413217" class="indexterm"></a><a id="id2355608" class="indexterm"></a> を例にして考えてみましょう。
+      あなたが書くことになるひとつひとつのサンプルは、
+      ソースコードが持つ振る舞い (behaviour)<a id="id2337553" class="indexterm"></a> のある側面を表すものになります。
+      たとえばその振る舞いがどのような場合に発生するのか、
+      その結果どのような影響が出るのかといったことを表します。
+      振舞駆動開発<a id="id2332017" class="indexterm"></a> では、これらのサンプルのことをスペック
+      (仕様) と呼びます。
+    </p>
+      <p>
+      BDD では、読みやすい形式のサンプルを書くことを推し進めています。
+      流れるように書けるドメイン特化言語
+      <a id="id568467" class="indexterm"></a>
+      を用いることで、作成したサンプルのドキュメントとしての価値も向上します。
+      次のふたつの例を比較してみましょう。
+      2 番目の例のほうが、明確で読みやすく感じられるはずです。
+    </p>
+      <div class="example">
+        <a id="id2331231"></a>
+        <p class="title">
+          <b>例 3.1. PHPUnit の例</b>
+        </p>
+        <div class="example-contents">
+          <pre class="programlisting">$logger = new Logger;
+$this-&gt;assertTrue($logger-&gt;hasFile());</pre>
+        </div>
+      </div>
+      <br class="example-break" />
+      <div class="example">
+        <a id="id2331253"></a>
+        <p class="title">
+          <b>例 3.2. PHPSpec の例</b>
+        </p>
+        <div class="example-contents">
+          <pre class="programlisting">$logger = new Logger;
+$this-&gt;spec($logger)-&gt;should-&gt;haveFile();</pre>
+        </div>
+      </div>
+      <br class="example-break" />
+      <p>
+      コードのサンプルは、単なるテストだけではなくそれ自体がドキュメントにもなります。
+      サンプルを書くときには、できるだけ自然な英語の流れに沿うようにしましょう。
+      そうすることで、明確で読みやすいドキュメントとすることができます。
+      各サンプルは、そのまま普通の英語の文章に戻せなければなりません。
+      たとえば、先ほどのサンプルは次のように書き戻すことができます。
+    </p>
+      <div class="informalexample">
+        <p>Logger</p>
+        <p>- should have a file</p>
+      </div>
+      <p>
+      ここで改めて言っておきますが、BDD というのは単に TDD
+      の "assert" を "should" に置き換えただけのものではありません。
+      BDD が存在する理由はそんなところにはなく、
+      TDD と比べてよりシンプルな言語で書くことができるということにあります。
+    </p>
+    </div>
+    <div class="navfooter">
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="introduction.html">前のページ</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="introduction.html">上に戻る</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="writing.examples.specs.before.writing.code.html">次のページ</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">第3章 導入 </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">ホーム</a>
+          </td>
+          <td width="40%" align="right" valign="top"> 3.3. コードの前にまずサンプル (スペック) から</td>
+        </tr>
+      </table>
+    </div>
+    <div xmlns="" class="revinfo"></div>
+  </body>
+</html>
