@@ -2,9 +2,11 @@
 
 	require_once RASP_TYPES_PATH . 'string.php';
 	require_once RASP_TYPES_PATH . 'array.php';
+	require_once RASP_TYPES_PATH . 'hash.php';
 	require_once RASP_RESOURCES_PATH . 'database.php';
 	require_once RASP_PATH . 'exception.php';
 	require_once RASP_TOOLS_PATH . 'catcher.php';
+	require_once RASP_ORM_PATH . 'active_field.php';
 
 	class RaspDatabaseParamsException extends RaspException { public $message = 'No connection params for database'; }
 
@@ -12,7 +14,7 @@
 
 		public static $db = null;
 		public static $connection_params = array();
-		public static $table_name, $class_name = __CLASS__;
+		public static $table_name, $class_name = __CLASS__, $table_fields = array(), $fields = array();
 		public static $database_driver = 'RaspDatabase';
 		public $attributes;
 
@@ -43,6 +45,19 @@
 			return ($saving ? $object->save() : $object);
 		}
 
+		public static function table_fields(){
+			if(empty(self::$table_fields)){
+				self::establish_connection();
+				$reponse_resource = self::$db->query('SHOW COLUMNS FROM ' . self::$table_name);
+				while($result = self::$db->fetch($reponse_resource)) self::$table_fields[] = RaspActiveField::create($result);
+				return self::$table_fields;
+			} else return self::$table_fields;
+		}
+
+		public static function fields(){
+			return (empty(self::$fields) ? RaspHash::map(self::table_fields(), 'field') : self::$fields);
+		}
+
 		public function save(){
 			return ($this->has_id() ? $this->update() : $this->insert());
 		}
@@ -51,14 +66,26 @@
 			self::establish_connection();
 			$strings_for_update = array();
 			foreach($this->attributes as $attribute => $value)
-				$strings_for_update[] = self::escape($attribute, '`') . ' = ' . self::escape($value);
+				if(in_array($attribute, $this->only_table_attributes())) $strings_for_update[] = self::escape($attribute, '`') . ' = ' . self::escape($value);
 			return self::$db->query('UPDATE ' . self::$table_name . ' SET ' . join(',', $strings_for_update) . ' WHERE `id` = ' . $this->attributes['id']);
 		}
 
 		public function insert(){
 			self::establish_connection();
-			$sql = "INSERT INTO " . self::$table_name . "(" . join(',', self::escape($this->attributes_names(), '`')) . ") VALUES (" . join(',', self::escape($this->values())) . ");";
+			$sql = "INSERT INTO " . self::$table_name . "(" . join(',', self::escape($this->only_table_attributes(), '`')) . ") VALUES (" . join(',', self::escape($this->only_table_values())) . ");";
 			return self::$db->query($sql);
+		}
+
+		public function only_table_attributes(){
+			$fields = array();
+			foreach($this->attributes_names() as $name) if(in_array($name, self::fields())) $fields[] = $name;
+			return $fields;
+		}
+
+		public function only_table_values(){
+			$values = array();
+			foreach($this->attributes_names() as $name) if(in_array($name, self::fields())) $values[] = $this->attributes[$name];
+			return $values;
 		}
 
 		public function has_id(){
