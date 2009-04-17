@@ -23,7 +23,7 @@
 				$this->source = $options['source'];
 				try {
 					$this->handler = @fopen($this->source, RaspArray::index($options, 'mode', self::DEFAULT_FILE_MOD));
-					if(!$this->handler) throw new RaspFileOpenException; else return $this->handler;
+					if(!$this->handler) throw new RaspFileOpenException; return $this->handler;
 				} catch(RaspFileOpenException $e){ RaspCatcher::add($e); }
 			} else return false;
 		}
@@ -35,6 +35,7 @@
 
 		public function close(){
 			fclose($this->handler);
+			$this->__destruct();
 		}
 
 		public function read($block = self::DEFAULT_READ_BLOCK){

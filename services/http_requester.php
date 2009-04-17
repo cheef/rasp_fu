@@ -4,6 +4,11 @@
 	require_once RASP_TOOLS_PATH . 'http_response.php';
 	require_once RASP_TOOLS_PATH . 'http_header.php';
 	require_once RASP_TYPES_PATH . 'array.php';
+	require_once RASP_TOOLS_PATH . 'catcher.php';
+	require_once RASP_PATH . 'exception.php';
+
+	class RaspCurlInitException extends RaspException { public $message = "Curl initialization failed"; }
+	class RaspCurlExecutingException extends RaspException { public $message = "Curl executing failed"; }
 
 	class RaspHttpRequester extends RaspAbstractService {
 		public static $default_requester_options = array('port' => 80, 'timeout' => 60);
@@ -12,7 +17,9 @@
 
 		public function __construct($options = array()){
 			$request_options = array_merge(self::$default_requester_options, $options);
-			$this->handler = curl_init();
+
+			try { if(!$this->handler = curl_init()) throw new RaspCurlInitException; }
+			catch(RaspCurlInitException $e) { RaspCatcher::add($e); }
 
 			$this->set(array(
 				CURLOPT_PORT => RaspArray::delete($request_options, 'port'),
@@ -34,7 +41,10 @@
 
 		public function send($url){
 			$this->set(array(CURLOPT_URL => $url . (empty($this->get_data) ? '' : '?' . $this->get_data)));
-			return RaspHttpResponse::create(array('source' => $this->request(), 'info' => curl_getinfo($this->handler)));
+			try {
+				if(!($response = $this->request())) throw new RaspCurlExecutingException;
+				return RaspHttpResponse::create(array('source' => $response, 'info' => curl_getinfo($this->handler)));
+			} catch(RaspCurlExecutingException $e) { RaspCatcher::add($e); }
 		}
 
 		private function request(){
