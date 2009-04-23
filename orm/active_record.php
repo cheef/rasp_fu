@@ -73,8 +73,8 @@
 		}
 
 		public function update(){
-			if(!self::establish_connection()) throw new RaspARConnectionException;
 			try {
+				if(!self::establish_connection()) throw new RaspARConnectionException;
 				$strings_for_update = array();
 				foreach($this->attributes as $attribute => $value)
 				if(in_array($attribute, $this->only_table_attributes())) $strings_for_update[] = self::escape($attribute, '`') . ' = ' . self::escape($value);
@@ -130,8 +130,8 @@
 		}
 
 		public static function find_by_sql($sql){
-			if(!self::establish_connection()) throw new RaspARConnectionException;
 			try {
+				if(!self::establish_connection()) throw new RaspARConnectionException;
 				$returning = array();
 				$reponse_resource = self::$db->query($sql);
 				while($result = self::$db->fetch($reponse_resource)) $returning[] = new self::$class_name($result);
