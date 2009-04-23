@@ -9,6 +9,7 @@
 	require_once RASP_ORM_PATH . 'active_field.php';
 
 	class RaspDatabaseParamsException extends RaspException { public $message = 'No connection params for database'; }
+	class RaspARConnectionException extends RaspException { public $message = 'No connection with database'; }
 
 	class RaspActiveRecord {
 
@@ -37,7 +38,16 @@
 		public static function find($mode, $options = array()){
 			switch($mode){
 				case 'all': return self::find_all($options);
+				case 'first': return self::find_first($options);
 			}
+		}
+
+		private static function conditions($options){
+			return '';
+		}
+
+		public static function find_first($options){
+			return RaspArray::first(self::find_by_sql('SELECT * FROM ' . self::$table_name . ' ' . self::conditions($options) . ' LIMIT 1'));
 		}
 
 		public static function create($params, $saving = true){
@@ -63,17 +73,21 @@
 		}
 
 		public function update(){
-			self::establish_connection();
-			$strings_for_update = array();
-			foreach($this->attributes as $attribute => $value)
+			if(!self::establish_connection()) throw new RaspARConnectionException;
+			try {
+				$strings_for_update = array();
+				foreach($this->attributes as $attribute => $value)
 				if(in_array($attribute, $this->only_table_attributes())) $strings_for_update[] = self::escape($attribute, '`') . ' = ' . self::escape($value);
-			return self::$db->query('UPDATE ' . self::$table_name . ' SET ' . join(',', $strings_for_update) . ' WHERE `id` = ' . $this->attributes['id']);
+				return self::$db->query('UPDATE ' . self::$table_name . ' SET ' . join(',', $strings_for_update) . ' WHERE `id` = ' . $this->attributes['id']);
+			} catch(RaspARConnectionException $e){ RaspCatcher::add($e); }
 		}
 
 		public function insert(){
-			self::establish_connection();
-			$sql = "INSERT INTO " . self::$table_name . "(" . join(',', self::escape($this->only_table_attributes(), '`')) . ") VALUES (" . join(',', self::escape($this->only_table_values())) . ");";
-			return self::$db->query($sql);
+			try {
+				if(!self::establish_connection()) throw new RaspARConnectionException;
+				$sql = "INSERT INTO " . self::$table_name . "(" . join(',', self::escape($this->only_table_attributes(), '`')) . ") VALUES (" . join(',', self::escape($this->only_table_values())) . ");";
+				return self::$db->query($sql);
+			} catch(RaspARConnectionException $e){ RaspCatcher::add($e); }
 		}
 
 		public function only_table_attributes(){
@@ -112,15 +126,17 @@
 		}
 
 		public static function find_all($options = array()){
-			return self::find_by_sql('SELECT * FROM ' . self::$table_name);
+			return self::find_by_sql('SELECT * FROM ' . self::$table_name . ' ' . self::conditions($options));
 		}
 
 		public static function find_by_sql($sql){
-			self::establish_connection();
-			$returning = array();
-			$reponse_resource = self::$db->query($sql);
-			while($result = self::$db->fetch($reponse_resource)) $returning[] = new self::$class_name($result);
-			return $returning;
+			if(!self::establish_connection()) throw new RaspARConnectionException;
+			try {
+				$returning = array();
+				$reponse_resource = self::$db->query($sql);
+				while($result = self::$db->fetch($reponse_resource)) $returning[] = new self::$class_name($result);
+				return $returning;
+			} catch(RaspARConnectionException $e){ RaspCatcher::add($e); }
 		}
 
 		public static function establish_connection(){
