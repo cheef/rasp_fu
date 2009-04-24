@@ -57,10 +57,12 @@
 
 		public static function table_fields(){
 			if(empty(self::$table_fields)){
-				self::establish_connection();
-				$reponse_resource = self::$db->query('SHOW COLUMNS FROM ' . self::$table_name);
-				while($result = self::$db->fetch($reponse_resource)) self::$table_fields[] = RaspActiveField::create($result);
-				return self::$table_fields;
+				try {
+					if(!self::establish_connection()) throw new RaspARConnectionException;
+					$reponse_resource = self::$db->query('SHOW COLUMNS FROM ' . self::$table_name);
+					while($result = self::$db->fetch($reponse_resource)) self::$table_fields[] = RaspActiveField::create($result);
+					return self::$table_fields;
+				} catch(RaspARConnectionException $e){ RaspCatcher::add($e); }
 			} else return self::$table_fields;
 		}
 
@@ -107,9 +109,7 @@
 		}
 
 		public function attributes_names(){
-			$attributes_names = array();
-			foreach($this->attributes as $attribute => $value) $attributes_names[] = $attribute;
-			return $attributes_names;
+			return RaspArray::keys($this->attributes);
 		}
 
 		public function values(){
