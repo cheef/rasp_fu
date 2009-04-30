@@ -42,8 +42,10 @@
 			}
 		}
 
-		private static function conditions($options){
-			return '';
+		private static function conditions($options = array()){
+			if(!empty($options) && ($conditions = RaspArray::index($options, 'conditions', false))){
+				return ' WHERE ' . $conditions;
+			} else return '';
 		}
 
 		public static function find_first($options){
@@ -82,6 +84,11 @@
 				if(in_array($attribute, $this->only_table_attributes())) $strings_for_update[] = self::escape($attribute, '`') . ' = ' . self::escape($value);
 				return self::$db->query('UPDATE ' . self::$table_name . ' SET ' . join(',', $strings_for_update) . ' WHERE `id` = ' . $this->attributes['id']);
 			} catch(RaspARConnectionException $e){ RaspCatcher::add($e); }
+		}
+
+		public function update_all($attributes){
+			foreach($attributes as $attribute => $value) $this->set($attribute, $value);
+			return $this->update();
 		}
 
 		public function insert(){
