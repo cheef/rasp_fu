@@ -48,8 +48,26 @@
 			} else return '';
 		}
 
+		private static function limit($options = array()){
+			if(!empty($options) && ($limit = RaspArray::index($options, 'limit', false))){
+				return ' LIMIT ' . $limit;
+			} else return '';
+		}
+
+		private static function order_by($options = array()){
+			if(!empty($options) && ($order_by = RaspArray::index($options, 'order_by', false))){
+				return ' ORDER BY ' . $order_by;
+			} else return '';
+		}
+
+		private static function offset($options = array()){
+			if(!empty($options) && ($offset = RaspArray::index($options, 'offset', false))){
+				return ' OFFSET ' . $offset;
+			} else return '';
+		}
+
 		public static function find_first($options){
-			return RaspArray::first(self::find_by_sql('SELECT * FROM ' . self::$table_name . ' ' . self::conditions($options) . ' LIMIT 1'));
+			return RaspArray::first(self::find_by_sql('SELECT * FROM ' . self::$table_name . self::conditions($options) . ' LIMIT 1'));
 		}
 
 		public static function create($params, $saving = true){
@@ -133,7 +151,7 @@
 		}
 
 		public static function find_all($options = array()){
-			return self::find_by_sql('SELECT * FROM ' . self::$table_name . ' ' . self::conditions($options));
+			return self::find_by_sql('SELECT * FROM ' . self::$table_name . self::conditions($options) . self::order_by($options) . self::limit($options));
 		}
 
 		public static function find_by_sql($sql){
