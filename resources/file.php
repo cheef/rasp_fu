@@ -107,10 +107,10 @@
 
 		public function delete($options = array()){
 			try {
-				if(RaspArray::is_not_empty($options, 'source')){
+				if(RaspArray::is_not_empty($options, 'target')){
 					#static method behavior#
-					if(!self::is_exists($options['source'])) throw new RaspFileException(self::EXCEPTION_DELETED_FILE_NOT_EXIST);
-					if(!(@unlink($options['source']))) throw new RaspFileException(self::EXCEPTION_FILE_DELETION);
+					if(!self::is_exists($options['target'])) throw new RaspFileException(self::EXCEPTION_DELETED_FILE_NOT_EXIST);
+					if(!(@unlink($options['target']))) throw new RaspFileException(self::EXCEPTION_FILE_DELETION);
 					else return true;
 				} else {
 					#object method behavior#
