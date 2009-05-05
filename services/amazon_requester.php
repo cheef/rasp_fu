@@ -16,6 +16,9 @@
 			),
 			'ItemLookup' => array(
 				'Operation' => 'ItemLookup'
+			),
+			'ItemSearch' => array(
+				'Operation' => 'ItemSearch'
 			)
 		);
 
@@ -42,6 +45,14 @@
 		public static function request_items_by_seller($seller_id, $request_params, $connection_params = array()){
 			$request_params = array_merge(self::$default_operation_options['SellerListingSearch'], $request_params);
 			$request_params['SellerId'] = $seller_id;
+			return self::request($request_params, $connection_params);
+		}
+
+		public static function request_item_by_merchant_id_and_asin($merchant_id, $asin, $request_params, $connection_params = array()){
+			$request_params = array_merge(self::$default_operation_options['ItemLookup'], $request_params);
+			$request_params['MerchantId'] = $merchant_id;
+			$request_params['ItemId'] = $asin;
+			$request_params['IdType'] = 'ASIN';
 			return self::request($request_params, $connection_params);
 		}
 

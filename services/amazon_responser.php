@@ -38,6 +38,25 @@
 			}
 		}
 
+		public static function parse_item_lookup_with_merchant($xml_source){
+			if(self::has_errors($xml_source)) return false;
+			else {
+				$parser = new MiniXMLDoc();
+				$parser->fromString($xml_source);
+				$item = array();
+				foreach($parser->getRoot()->getElementByPath('Items/Item/OfferSummary')->getAllChildren() as $attribute_node){
+					if($attribute_node->xnumChildren <= 1) $item[$attribute_node->xname] = $attribute_node->getValue();
+					elseif($attribute_node->name() == 'LowestNewPrice') $item['LowestNewPrice'] = $attribute_node->getElement('Amount')->getValue();
+					elseif($attribute_node->name() == 'LowestUsedPrice') $item['LowestUsedPrice'] = $attribute_node->getElement('Amount')->getValue();
+					elseif($attribute_node->name() == 'LowestCollectiblePrice') $item['LowestCollectiblePrice'] = $attribute_node->getElement('Amount')->getValue();
+				}
+				foreach($parser->getRoot()->getElementByPath('Items/Item/Offers/Offer/OfferListing')->getAllChildren() as $offer_node){
+					if($offer_node->name() == 'Price') $item['Amount'] = $offer_node->getElement('Amount')->getValue();
+				}
+				return $item;
+			}
+		}
+
 		public static function parse_item_lookup($xml_source){
 			if(self::has_errors($xml_source)) return false;
 			else {

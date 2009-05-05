@@ -2,7 +2,7 @@
 	class RaspSocket {
 		public $connection, $error_number = '', $error_value = '';
 
-		public function Socket($url, $options = array()){
+		public function __construct($url, $options = array()){
 			$options = array_merge($this->default_params(), $options);
 			$this->connection = fsockopen($url, $options['port'], $this->error_number, $this->error_value, $options['timeout']);
 		}
@@ -39,7 +39,7 @@
 		}
 
 		public static function request($url, $params, $http_request){
-			$socket = new Socket($url, $params);
+			$socket = new RaspSocket($url, $params);
 			return $socket->send($http_request);
 		}
 
