@@ -7,6 +7,10 @@
 		private static $vowels = array('a', 'e', 'y', 'i', 'o', 'u');
 		private static $exception_symbol = 'y';
 
+		public function __construct($source){
+			$this->source = $source;
+		}
+
 		public static function underscore($string) {
 			return strtolower(preg_replace('/(?<=\w)([A-Z])(?=[a-z])/', '_\\1', $string));
 		}
@@ -37,6 +41,19 @@
 
 		public static function is_exception($symbol){
 			return $symbol == self::$exception_symbol;
+		}
+
+		public static function escape($string, $symbols = array("'")){
+			foreach($symbols as $symbol) $string = str_replace($symbol, "\\" . $symbol, $string);
+			return $string;
+		}
+
+		public static function create($source){
+			return new RaspString($source);
+		}
+
+		public function to_s(){
+			return $this->source;
 		}
 	}
 ?>
