@@ -76,5 +76,10 @@
 				return $item;
 			}
 		}
+
+		public static function clear_errors(){
+			self::$errors = array();
+			self::$has_errors = false;
+		}
 	}
 ?>
