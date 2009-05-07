@@ -50,8 +50,12 @@
 					elseif($attribute_node->name() == 'LowestUsedPrice') $item['LowestUsedPrice'] = $attribute_node->getElement('Amount')->getValue();
 					elseif($attribute_node->name() == 'LowestCollectiblePrice') $item['LowestCollectiblePrice'] = $attribute_node->getElement('Amount')->getValue();
 				}
-				foreach($parser->getRoot()->getElementByPath('Items/Item/Offers/Offer/OfferListing')->getAllChildren() as $offer_node){
-					if($offer_node->name() == 'Price') $item['Amount'] = $offer_node->getElement('Amount')->getValue();
+				if($offers = $parser->getRoot()->getElementByPath('Items/Item/Offers/Offer/OfferListing')){
+					foreach($offers->getAllChildren() as $offer_node)
+						if($offer_node->name() == 'Price') $item['Amount'] = $offer_node->getElement('Amount')->getValue();
+				} else {
+					self::$errors[] = array('code' => 'NO_ITEM', 'message' => 'Selected merchant don\'t sell this item');
+					return false;
 				}
 				return $item;
 			}
