@@ -18,7 +18,8 @@
 				'Operation' => 'ItemLookup'
 			),
 			'ItemSearch' => array(
-				'Operation' => 'ItemSearch'
+				'Operation' => 'ItemSearch',
+				'SearchIndex' => 'Books'
 			)
 		);
 
@@ -53,6 +54,15 @@
 			$request_params['MerchantId'] = $merchant_id;
 			$request_params['ItemId'] = $asin;
 			$request_params['IdType'] = 'ASIN';
+			$request_params['ResponseGroup'] = 'OfferFull';
+			return self::request($request_params, $connection_params);
+		}
+
+		public static function request_offers_for_item($asin, $request_params, $connection_params = array()){
+			$request_params = array_merge(self::$default_operation_options['ItemLookup'], $request_params);
+			$request_params['ItemId'] = $asin;
+			$request_params['ResponseGroup'] = 'Offers';
+			$request_params['MerchantId'] = 'All';
 			return self::request($request_params, $connection_params);
 		}
 
