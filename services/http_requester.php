@@ -25,8 +25,11 @@
 				CURLOPT_PORT => RaspArray::delete($request_options, 'port'),
 				CURLOPT_RETURNTRANSFER => true,
 				CURLOPT_CONNECTTIMEOUT => RaspArray::delete($request_options, 'timeout'),
-				CURLOPT_HEADER => true
+				CURLOPT_HEADER => true,
+				CURLOPT_AUTOREFERER => true
 			));
+
+			if(RaspArray::index($request_options, 'redirect', false)) $this->set(array(CURLOPT_FOLLOWLOCATION => true));
 
 			if(RaspArray::index($request_options, 'headers', false))
 				$this->set(array(CURLOPT_HTTPHEADER => RaspHttpHeader::create(array('attributes' => RaspArray::delete($request_options, 'headers')))->to_curl_strings()));

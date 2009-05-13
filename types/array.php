@@ -13,6 +13,13 @@
 			foreach($array as $key => $value) $result[] = $key;
 			return $result;
 		}
+
+		public static function values($array){
+			$values = array();
+			foreach($array as $value) $values[] = $value;
+			return $values;
+		}
+
 		/**
 		 * @return mixed $element(or $key)  value of first element of input array (or it's key if $returnKey is true)
 		 * @param array $array
