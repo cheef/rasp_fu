@@ -55,5 +55,13 @@
 		public function to_s(){
 			return $this->source;
 		}
+
+		public static function replace_all($string, $masks){
+			foreach($masks as $mask => $replacement){
+				if(preg_match("'^/(.+)/(\w)*$'", $mask, $matches)) $string = preg_replace($mask, $replacement, $string);
+				else $string = str_replace($mask, $replacement, $string);
+			}
+			return $string;
+		}
 	}
 ?>

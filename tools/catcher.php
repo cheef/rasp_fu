@@ -7,6 +7,7 @@
 			$options = array_merge(self::$default_options, $options);
 			self::$exceptions[] = $exception;
 			if($options['die']) die(self::show());
+			else return false;
 		}
 
 		private static function show(){

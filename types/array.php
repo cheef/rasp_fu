@@ -158,6 +158,15 @@
 			return $value;
 		}
 
+		public static function delete_if(&$array, $rules){
+			foreach($array as $key => $element){
+				foreach($rules as $rule){
+					$matches = null;
+					preg_match_all($rule, $array, $matches);
+					if(!empty($matches)) {unset($array[$key]); break;}
+				}
+			}
+		}
 	}
 
 ?>
