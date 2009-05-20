@@ -29,6 +29,11 @@
 				CURLOPT_AUTOREFERER => true
 			));
 
+			if(RaspArray::index($request_options, 'auth_basic', false)) {
+				$this->set(array(CURLOPT_HTTPAUTH => CURLAUTH_BASIC));
+				$this->set(array(CURLOPT_USERPWD => $request_options['auth_basic']));
+			}
+
 			if(RaspArray::index($request_options, 'redirect', false)) $this->set(array(CURLOPT_FOLLOWLOCATION => true));
 
 			if(RaspArray::index($request_options, 'headers', false))
