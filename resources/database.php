@@ -64,6 +64,10 @@
 			return $returning;
 		}
 
+		public function drop($table_name){
+			return (empty($table_name) ? false : $this->query('DROP TABLE IF EXISTS '. $table_name . ';'));
+		}
+
 		public function error_message(){
 			return mysql_error($this->handler);
 		}
