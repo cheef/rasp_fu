@@ -88,19 +88,25 @@
 				$parser = new MiniXMLDoc();
 				$parser->fromString($xml_source);
 				$item = array();
-				foreach($parser->getRoot()->getElementByPath('Items/Item/Offers')->getAllChildren() as $offers_node){
-					if($offers_node->xnumChildren <= 1) $item[$offers_node->xname] = $offers_node->getValue();
-					elseif($offers_node->xname == 'Offer') {
-						$offer = array();
-						foreach($offers_node->getElementByPath('OfferAttributes')->getAllChildren() as $offer_node) $offer[$offer_node->xname] = $offer_node->getValue();
-						if($merchant_node = $offers_node->getElementByPath('Merchant')){
-							foreach($merchant_node->getAllChildren() as $offer_node) $offer[$offer_node->xname] = $offer_node->getValue();
-						} elseif($seller_node = $offers_node->getElementByPath('Seller')){
-							foreach($seller_node->getAllChildren() as $offer_node) $offer[$offer_node->xname] = $offer_node->getValue();
+				$offers_html = $parser->getRoot()->getElementByPath('Items/Item/Offers');
+				if(!empty($offers_html)){
+					foreach($offers_html->getAllChildren() as $offers_node){
+						if($offers_node->xnumChildren <= 1) $item[$offers_node->xname] = $offers_node->getValue();
+						elseif($offers_node->xname == 'Offer') {
+							$offer = array();
+							foreach($offers_node->getElementByPath('OfferAttributes')->getAllChildren() as $offer_node) $offer[$offer_node->xname] = $offer_node->getValue();
+							if($merchant_node = $offers_node->getElementByPath('Merchant')){
+								foreach($merchant_node->getAllChildren() as $offer_node) $offer[$offer_node->xname] = $offer_node->getValue();
+							} elseif($seller_node = $offers_node->getElementByPath('Seller')){
+								foreach($seller_node->getAllChildren() as $offer_node) $offer[$offer_node->xname] = $offer_node->getValue();
+							}
+							foreach($offers_node->getElementByPath('OfferListing/Price')->getAllChildren() as $price_node) $offer[$price_node->xname] = $price_node->getValue();
+							$item['Offers'][] = $offer;
 						}
-						foreach($offers_node->getElementByPath('OfferListing/Price')->getAllChildren() as $price_node) $offer[$price_node->xname] = $price_node->getValue();
-						$item['Offers'][] = $offer;
 					}
+				} else {
+					self::$errors[] = array('code' => 'EMPTY_XML', 'message' => 'Empty response from amazon');
+					return false;
 				}
 				return $item;
 			}
