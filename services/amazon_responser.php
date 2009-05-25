@@ -44,17 +44,23 @@
 				$parser = new MiniXMLDoc();
 				$parser->fromString($xml_source);
 				$item = array();
-				foreach($parser->getRoot()->getElementByPath('Items/Item/OfferSummary')->getAllChildren() as $attribute_node){
-					if($attribute_node->xnumChildren <= 1) $item[$attribute_node->xname] = $attribute_node->getValue();
-					elseif($attribute_node->name() == 'LowestNewPrice') $item['LowestNewPrice'] = $attribute_node->getElement('Amount')->getValue();
-					elseif($attribute_node->name() == 'LowestUsedPrice') $item['LowestUsedPrice'] = $attribute_node->getElement('Amount')->getValue();
-					elseif($attribute_node->name() == 'LowestCollectiblePrice') $item['LowestCollectiblePrice'] = $attribute_node->getElement('Amount')->getValue();
-				}
-				if($offers = $parser->getRoot()->getElementByPath('Items/Item/Offers/Offer/OfferListing')){
-					foreach($offers->getAllChildren() as $offer_node)
-						if($offer_node->name() == 'Price') $item['Amount'] = $offer_node->getElement('Amount')->getValue();
+				$offer_summary_node = $parser->getRoot()->getElementByPath('Items/Item/OfferSummary');
+				if(!empty($offer_summary_node)){
+					foreach($offer_summary_node->getAllChildren() as $attribute_node){
+						if($attribute_node->xnumChildren <= 1) $item[$attribute_node->xname] = $attribute_node->getValue();
+						elseif($attribute_node->name() == 'LowestNewPrice') $item['LowestNewPrice'] = $attribute_node->getElement('Amount')->getValue();
+						elseif($attribute_node->name() == 'LowestUsedPrice') $item['LowestUsedPrice'] = $attribute_node->getElement('Amount')->getValue();
+						elseif($attribute_node->name() == 'LowestCollectiblePrice') $item['LowestCollectiblePrice'] = $attribute_node->getElement('Amount')->getValue();
+					}
+					if($offers = $parser->getRoot()->getElementByPath('Items/Item/Offers/Offer/OfferListing')){
+						foreach($offers->getAllChildren() as $offer_node)
+							if($offer_node->name() == 'Price') $item['Amount'] = $offer_node->getElement('Amount')->getValue();
+					} else {
+						self::$errors[] = array('code' => 'NO_ITEM', 'message' => 'Selected merchant don\'t sell this item');
+						return false;
+					}
 				} else {
-					self::$errors[] = array('code' => 'NO_ITEM', 'message' => 'Selected merchant don\'t sell this item');
+					self::$errors[] = array('code' => 'SOMETHING_WRONG', 'message' => 'No summary found');
 					return false;
 				}
 				return $item;
