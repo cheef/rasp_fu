@@ -17,6 +17,7 @@
 		public static $connection_params = array();
 		public static $table_name, $class_name = __CLASS__, $table_fields = array(), $fields = array();
 		public static $database_driver = 'RaspDatabase';
+		public static $underscored = true;
 		public $attributes;
 
 		public function __construct($params){
@@ -24,7 +25,7 @@
 		}
 
 		public function set($attribute, $value){
-			eval("return \$this->" . RaspString::underscore($attribute) . " = \$value;");
+			eval("return \$this->" . (self::$underscored ? RaspString::underscore($attribute) : $attribute) . " = \$value;");
 		}
 
 		public function __set($attribute, $value){
@@ -109,7 +110,7 @@
 				if(!self::establish_connection()) throw new RaspARConnectionException;
 				$strings_for_update = array();
 				foreach($this->attributes as $attribute => $value)
-				if(in_array($attribute, $this->only_table_attributes())) $strings_for_update[] = self::escape($attribute, '`') . ' = ' . self::escape($value);
+					if(in_array($attribute, $this->only_table_attributes())) $strings_for_update[] = self::escape($attribute, '`') . ' = ' . self::escape($value);
 				return self::$db->query('UPDATE ' . self::$table_name . ' SET ' . join(',', $strings_for_update) . ' WHERE `id` = ' . $this->attributes['id']);
 			} catch(RaspARConnectionException $e){ RaspCatcher::add($e); }
 		}
