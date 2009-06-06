@@ -19,6 +19,8 @@
 		public static $table_name, $class_name = __CLASS__, $table_fields = array(), $fields = array();
 		public static $database_driver = 'RaspDatabase';
 		public static $underscored = true;
+    public static $options = array('underscored' => true);
+    public static $per_page = 10;
 		public $attributes;
 
 		public function __construct($params = array()){
@@ -48,7 +50,8 @@
 			}
 		}
 
-		public static function find_by_id($id, $options = array()){
+		public static function find_by_id($id, $options = array()){      
+      return RaspArray::first(self::find_by_sql('SELECT * FROM ' . self::$table_name . " WHERE id = '" . $id . "'"));
 		}
 
 		public static function find_count($options = array()){
@@ -78,6 +81,18 @@
 				return $returning;
 			} catch(RaspARConnectionException $e){ RaspCatcher::add($e); }
 		}
+
+    #Paginator
+
+    public static function paginate($page_num = 1, $options = array()){
+      $options = array_merge($options, array('limit' => self::$per_page, 'offset' => (($page_num - 1) * self::$per_page)));
+      return self::find('all', $options);
+    }
+
+    public static function pages($options = array()){
+      $records = self::find('count', $options);
+      return ceil($records/self::$per_page);
+    }
 
 		#SQL constructor
 
@@ -112,8 +127,12 @@
 			return ($saving ? $object->save() : $object);
 		}
 
-		public function save($attributes = array()){
-			return ($this->has_id() ? $this->update($attributes) : $this->insert($attributes));
+		public function save($attributes = array(), $validate = true){
+      if(!empty($attributes)) foreach($attributes as $attribute => $value) $this->set($attribute, $value);
+      if($validate && $this->is_valid())
+        return ($this->has_id() ? $this->update($attributes) : $this->insert($attributes));
+      elseif(!$validate) return ($this->has_id() ? $this->update($attributes) : $this->insert($attributes));
+      else return false;
 		}
 
 		public function update($attributes = array()){
@@ -167,6 +186,7 @@
 		#Validation
 
 		public function is_valid(){
+      return true;
 		}
 
 		#Other methods
@@ -197,6 +217,10 @@
 			foreach($this->attributes_names() as $name) if(in_array($name, self::fields())) $values[] = $this->attributes[$name];
 			return $values;
 		}
+
+    public function is_new_record(){
+      return !$this->has_id();
+    }
 
 		public function has_id(){
 			return isset($this->attributes['id']) && !empty($this->attributes['id']);
