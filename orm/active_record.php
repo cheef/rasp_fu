@@ -157,6 +157,11 @@
 			} catch(RaspARConnectionException $e){ RaspCatcher::add($e); }
 		}
 
+    public function delete(){
+      return self::$db->query("DELETE FROM " . self::$table_name . " WHERE `id` = " . $this->id);
+    }
+
+
 		public function update_all($attributes){
 			foreach($attributes as $attribute => $value) $this->set($attribute, $value);
 			return $this->update();
