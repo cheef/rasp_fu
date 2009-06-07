@@ -1,7 +1,8 @@
 <?php
+
 	/**
 	 * @author cheef, simsalabim
-	 * Adding array functionality into project
+	 * Adding array functionality
 	 */
 
 	require_once RASP_TYPES_PATH . 'abstract_type.php';
@@ -167,6 +168,11 @@
 				}
 			}
 		}
+
+    public static function compact($array){
+      foreach($array as $key => $element) if(empty($element)) unset($array[$key]);
+      return $array;
+    }
 	}
 
 ?>
