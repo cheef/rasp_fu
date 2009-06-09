@@ -11,7 +11,7 @@
     const EXCEPTION_NO_FOUND_MATCHES = "No found any variables in construct mask";
     const EXCEPTION_WRONG_SET_TYPE = "Wrong set type, expected string or integer";
 
-    private $construction = null, $variables = null, $sql = null, $values = null;
+    private $construction = null, $variables = null, $sql = null, $values = null, $type = null;
 
     private static $match_mask = '\[([a-zA-Z_0-9]+)\]';
     public static $values_closer = "'";
@@ -26,15 +26,16 @@
       return new RaspElementary($attributes);
     }
 
-    public function construction($mask){
+    public function construction($mask, $type = 'expression'){
       $this->construction = $mask;
+      $this->type = $type;
       $this->variables = self::match($mask);
       return $this;
     }
 
-    public function set($values, $delimiter = ',', $closer = ''){
+    public function set($values){
     	try {
-	    	if(is_string($values) || is_int($values)) $this->values[RaspArray::first($this->variables)][] = $closer . $values . $closer;
+	    	if(is_string($values) || is_int($values)) $this->values[RaspArray::first($this->variables)][] = $values;
 	    	else throw new RaspElementaryException(self::EXCEPTION_WRONG_SET_TYPE);
     	} catch (RaspSelectException $e) { RaspCatcher::add($e); }
       return $this;
@@ -48,7 +49,11 @@
 
     private function stringify_values($attribute){
     	$attribute_values = RaspArray::index($this->values, $attribute, array());
-    	return join(', ', $attribute_values);
+    	return join($this->is_logic_type() ? ' AND ' : ', ', $attribute_values);
+    }
+
+    private function is_logic_type(){
+    	return $this->type == 'logic';
     }
 
     public function sql(){

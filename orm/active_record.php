@@ -8,9 +8,12 @@
 	require_once RASP_TOOLS_PATH . 'catcher.php';
 	require_once RASP_ORM_PATH . 'active_field.php';
 	require_once RASP_ORM_PATH . 'interfaces/model.php';
+	require_once RASP_ORM_PATH . 'sql_constructor.php';
+	require_once RASP_ORM_PATH . 'constructions/expression.php';
 
 	class RaspDatabaseParamsException extends RaspException { public $message = 'No connection params for database'; }
 	class RaspARConnectionException extends RaspException { public $message = 'No connection with database'; }
+	class RaspActiveRecordException extends RaspException {};
 
 	class RaspActiveRecord implements RaspModel {
 
@@ -22,6 +25,9 @@
     public static $options = array('underscored' => true);
     public static $per_page = 10;
 		public $attributes;
+
+		const EXCEPTION_WRONG_FIND_MODE = "Wrong find mode, try others, like 'all' or 'first'";
+		const EXCEPTION_MISSED_ID = "Missed id param";
 
 		public function __construct($params = array()){
 			if(!empty($params)) foreach($params as $attribute => $value) $this->set($attribute, $value);
@@ -42,33 +48,63 @@
 		#Find methods
 
 		public static function find($mode, $options = array()){
-			if(is_int($mode)) return self::find_by_id($mode, $options);
-			switch($mode){
-				case 'all': return self::find_all($options);
-				case 'first': return self::find_first($options);
-				case 'count': return self::find_count($options);
-			}
+			try {
+				if(is_int(intval($mode)) && (intval($mode) != 0)) return self::find_by_id($mode, $options);
+				switch($mode){
+					case 'all': return self::find_all($options);
+					case 'first': return self::find_first($options);
+					case 'count': return self::find_count($options);
+					case 'constructor': return self::find_by_constructor();
+					default: throw new RaspActiveRecordException(self::EXCEPTION_WRONG_FIND_MODE); break;
+				}
+			} catch (RaspActiveRecordException $e) { RaspCatcher::add($e); }
 		}
 
-		public static function find_by_id($id, $options = array()){      
-      return RaspArray::first(self::find_by_sql('SELECT * FROM ' . self::$table_name . " WHERE id = '" . $id . "'"));
+		public static function find_by_id($id, $options = array()){
+			try {
+				if(empty($id)) throw new RaspActiveRecordException(self::EXCEPTION_MISSED_ID);
+				$q = self::find('constructor');
+				$q->select('all')
+					->from(self::$table_name)
+					->where(self::conditions($options))
+					->where(array('id' => $id))
+					->order(self::order_by($options))
+					->limit(self::limit($options))
+					->offset(self::offset($options));
+				return RaspArray::first(self::find_by_sql($q->to_sql()));
+			} catch (RaspActiveRecordException $e) { RaspCatcher::add($e); }
 		}
 
 		public static function find_count($options = array()){
 			try {
-				self::initilize();
-				$request = 'SELECT count(*) FROM ' . self::$table_name . self::conditions($options);
+				$q = self::find('constructor');
+				$q->select('COUNT(*)')
+				->from(self::$table_name)
+				->where(self::conditions($options))
+				->limit(1);
 				if(!self::establish_connection()) throw new RaspARConnectionException;
-				return RaspArray::first(self::$db->fetch(self::$db->query($request)));
+				return RaspArray::first(self::$db->fetch(self::$db->query($q->to_sql())));
 			} catch(RaspARConnectionException $e){ RaspCatcher::add($e); }
 		}
 
 		public static function find_first($options = array()){
-			return RaspArray::first(self::find_by_sql('SELECT * FROM ' . self::$table_name . self::conditions($options) . ' LIMIT 1'));
+			$q = self::find('constructor');
+			$q->select('all')
+				->from(self::$table_name)
+				->where(self::conditions($options))
+				->limit(1);
+			return self::find_by_sql($q->to_sql());
 		}
 
 		public static function find_all($options = array()){
-			return self::find_by_sql('SELECT * FROM ' . self::$table_name . self::conditions($options) . self::order_by($options) . self::limit($options) . self::offset($options));
+			$q = self::find('constructor');
+			$q->select('all')
+				->from(self::$table_name)
+				->where(self::conditions($options))
+				->order(self::order_by($options))
+				->limit(self::limit($options))
+				->offset(self::offset($options));
+			return self::find_by_sql($q->to_sql());
 		}
 
 		public static function find_by_sql($sql){
@@ -80,6 +116,10 @@
 				while($result = self::$db->fetch($reponse_resource)) $returning[] = new self::$class_name($result);
 				return $returning;
 			} catch(RaspARConnectionException $e){ RaspCatcher::add($e); }
+		}
+
+		public static function find_by_constructor(){
+			return RaspSQLConstructor::create('select');
 		}
 
     #Paginator
@@ -96,28 +136,24 @@
 
 		#SQL constructor
 
+		public function q(){
+			return RaspWhereExpression::create();
+		}
+
 		private static function conditions($options = array()){
-			if(!empty($options) && ($conditions = RaspArray::index($options, 'conditions', false))){
-				return ' WHERE ' . $conditions;
-			} else return '';
+			return (!empty($options) && ($conditions = RaspArray::index($options, 'conditions', false)) ? $conditions : null);
 		}
 
 		private static function limit($options = array()){
-			if(!empty($options) && ($limit = RaspArray::index($options, 'limit', false))){
-				return ' LIMIT ' . $limit;
-			} else return '';
+			return (!empty($options) && ($limit = RaspArray::index($options, 'limit', false)) ? $limit : null);
 		}
 
 		private static function order_by($options = array()){
-			if(!empty($options) && ($order_by = RaspArray::index($options, 'order_by', false))){
-				return ' ORDER BY ' . $order_by;
-			} else return '';
+			return (!empty($options) && ($order_by = RaspArray::index($options, 'order_by', false)) ? $order_by : null);
 		}
 
 		private static function offset($options = array()){
-			if(!empty($options) && ($offset = RaspArray::index($options, 'offset', false))){
-				return ' OFFSET ' . $offset;
-			} else return '';
+			return (!empty($options) && ($offset = RaspArray::index($options, 'offset', false)) ? $offset : null);
 		}
 
 		#CRUD
