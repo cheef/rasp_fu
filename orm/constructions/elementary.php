@@ -9,7 +9,8 @@
   class RaspElementary {
 
     const EXCEPTION_NO_FOUND_MATCHES = "No found any variables in construct mask";
-    
+    const EXCEPTION_WRONG_SET_TYPE = "Wrong set type, expected string or integer";
+
     private $construction = null, $variables = null, $sql = null, $values = null;
 
     private static $match_mask = '\[([a-zA-Z_0-9]+)\]';
@@ -32,16 +33,22 @@
     }
 
     public function set($values, $delimiter = ',', $closer = ''){
-      $this->values[] = $closer . $values . $closer;
+    	try {
+	    	if(is_string($values) || is_int($values)) $this->values[RaspArray::first($this->variables)][] = $closer . $values . $closer;
+	    	else throw new RaspElementaryException(self::EXCEPTION_WRONG_SET_TYPE);
+    	} catch (RaspSelectException $e) { RaspCatcher::add($e); }
       return $this;
     }
 
     public function make(){
-      if(!empty($this->values)){
-        $this->sql = $this->construction;
-        foreach($this->variables as $key => $variable) $this->sql = str_replace('[' . $variable . ']', $this->values[$key], $this->sql);
-      }
+      if(!empty($this->values))
+        $this->sql = str_replace('[' . RaspArray::first($this->variables) . ']', $this->stringify_values(RaspArray::first($this->variables)), $this->construction);
       return $this;
+    }
+
+    private function stringify_values($attribute){
+    	$attribute_values = RaspArray::index($this->values, $attribute, array());
+    	return join(', ', $attribute_values);
     }
 
     public function sql(){
