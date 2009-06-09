@@ -18,6 +18,7 @@
 	class RaspActiveRecord implements RaspModel {
 
 		public static $db = null;
+		public static $children = null;
 		public static $connection_params = array();
 		public static $table_name, $class_name = __CLASS__, $table_fields = array(), $fields = array();
 		public static $database_driver = 'RaspDatabase';
@@ -109,11 +110,10 @@
 
 		public static function find_by_sql($sql){
 			try {
-				self::initilize();
 				if(!self::establish_connection()) throw new RaspARConnectionException;
 				$returning = array();
 				$reponse_resource = self::$db->query($sql);
-				while($result = self::$db->fetch($reponse_resource)) $returning[] = new self::$class_name($result);
+				eval('while($result = self::$db->fetch($reponse_resource)) $returning[] = new ' . self::$class_name . '($result);');
 				return $returning;
 			} catch(RaspARConnectionException $e){ RaspCatcher::add($e); }
 		}
@@ -149,7 +149,7 @@
 		}
 
 		private static function order_by($options = array()){
-			return (!empty($options) && ($order_by = RaspArray::index($options, 'order_by', false)) ? $order_by : null);
+			return (!empty($options) && ($order_by = RaspArray::index($options, 'order', false)) ? $order_by : null);
 		}
 
 		private static function offset($options = array()){
@@ -197,7 +197,6 @@
       return self::$db->query("DELETE FROM " . self::$table_name . " WHERE `id` = " . $this->id);
     }
 
-
 		public function update_all($attributes){
 			foreach($attributes as $attribute => $value) $this->set($attribute, $value);
 			return $this->update();
@@ -206,22 +205,30 @@
 		#Connection methods
 
 		public static function initilize(){
-			self::establish_connection(true);
+		}
+
+		public static function options(){
+
 		}
 
 		public static function establish_connection($forcing = false){
 			try {
-				if(empty(self::$connection_params)) throw new RaspDatabaseParamsException;
-				return (self::is_connection_established() && !$forcing ? self::$db : (self::$db = new self::$database_driver(self::$connection_params)));
+				eval('$connection_params = ' . self::$class_name .'::$connection_params;');
+				if(empty($connection_params)) throw new RaspDatabaseParamsException;
+				eval('$db = (' . self::$class_name . '::is_connection_established() && !$forcing) ? ' . self::$class_name . '::$db : new self::$database_driver($connection_params);');
+				eval(self::$class_name . '::$db = $db;');
+				return $db;
 			} catch(RaspDatabaseParamsException $e) { RaspCatcher::add($e); }
 		}
 
 		public static function close_connection(){
-			return self::$db->close();
+			eval('$closing = ' . self::$class_name . '::$db->close();');
+			return $closing;
 		}
 
 		public static function is_connection_established(){
-			return !empty(self::$db);
+			eval('$established = !empty(' . self::$class_name . '::$db);');
+			return $established;
 		}
 
 		#Validation
