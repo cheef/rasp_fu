@@ -18,9 +18,10 @@
 	class RaspActiveRecord implements RaspModel {
 
 		public static $db = null;
-		public static $children = null;
+		protected static $connections = array();
+		protected static $class_name;
 		public static $connection_params = array();
-		public static $table_name, $class_name = __CLASS__, $table_fields = array(), $fields = array();
+		public static $table_name, $table_fields = array(), $fields = array();
 		public static $database_driver = 'RaspDatabase';
 		public static $underscored = true;
     public static $options = array('underscored' => true);
@@ -29,6 +30,7 @@
 
 		const EXCEPTION_WRONG_FIND_MODE = "Wrong find mode, try others, like 'all' or 'first'";
 		const EXCEPTION_MISSED_ID = "Missed id param";
+		const EXCEPTION_MISSED_DATABASE_PARAMS = "Missed database connection params";
 
 		public function __construct($params = array()){
 			if(!empty($params)) foreach($params as $attribute => $value) $this->set($attribute, $value);
@@ -64,9 +66,10 @@
 		public static function find_by_id($id, $options = array()){
 			try {
 				if(empty($id)) throw new RaspActiveRecordException(self::EXCEPTION_MISSED_ID);
+				self::class_name($options);
 				$q = self::find('constructor');
 				$q->select('all')
-					->from(self::$table_name)
+					->from(self::table_name())
 					->where(self::conditions($options))
 					->where(array('id' => $id))
 					->order(self::order_by($options))
@@ -78,29 +81,33 @@
 
 		public static function find_count($options = array()){
 			try {
+				self::class_name($options);
 				$q = self::find('constructor');
 				$q->select('COUNT(*)')
-				->from(self::$table_name)
+				->from(self::table_name())
 				->where(self::conditions($options))
 				->limit(1);
 				if(!self::establish_connection()) throw new RaspARConnectionException;
-				return RaspArray::first(self::$db->fetch(self::$db->query($q->to_sql())));
+				return RaspArray::first(self::$connections[self::class_name()]->fetch(self::$connections[self::class_name()]->query($q->to_sql())));
 			} catch(RaspARConnectionException $e){ RaspCatcher::add($e); }
 		}
 
 		public static function find_first($options = array()){
+			self::class_name($options);
 			$q = self::find('constructor');
 			$q->select('all')
-				->from(self::$table_name)
+				->from(self::table_name())
 				->where(self::conditions($options))
 				->limit(1);
 			return self::find_by_sql($q->to_sql());
 		}
 
 		public static function find_all($options = array()){
+			self::class_name($options);
+
 			$q = self::find('constructor');
 			$q->select('all')
-				->from(self::$table_name)
+				->from(self::table_name())
 				->where(self::conditions($options))
 				->order(self::order_by($options))
 				->limit(self::limit($options))
@@ -108,28 +115,32 @@
 			return self::find_by_sql($q->to_sql());
 		}
 
-		public static function find_by_sql($sql){
+		public static function find_by_sql($sql, $options = array()){
 			try {
+				self::class_name($options);
 				if(!self::establish_connection()) throw new RaspARConnectionException;
 				$returning = array();
-				$reponse_resource = self::$db->query($sql);
-				eval('while($result = self::$db->fetch($reponse_resource)) $returning[] = new ' . self::$class_name . '($result);');
+				$reponse_resource = self::$connections[self::class_name()]->query($sql);
+				eval('while($result = self::$connections[self::class_name()]->fetch($reponse_resource)) $returning[] = new ' . self::$class_name . '($result);');
 				return $returning;
 			} catch(RaspARConnectionException $e){ RaspCatcher::add($e); }
 		}
 
-		public static function find_by_constructor(){
+		public static function find_by_constructor($options = array()){
+			self::class_name($options);
 			return RaspSQLConstructor::create('select');
 		}
 
     #Paginator
 
     public static function paginate($page_num = 1, $options = array()){
+    	self::class_name($options);
       $options = array_merge($options, array('limit' => self::$per_page, 'offset' => (($page_num - 1) * self::$per_page)));
       return self::find('all', $options);
     }
 
     public static function pages($options = array()){
+    	self::class_name($options);
       $records = self::find('count', $options);
       return ceil($records/self::$per_page);
     }
@@ -140,19 +151,19 @@
 			return RaspWhereExpression::create();
 		}
 
-		private static function conditions($options = array()){
+		protected static function conditions($options = array()){
 			return (!empty($options) && ($conditions = RaspArray::index($options, 'conditions', false)) ? $conditions : null);
 		}
 
-		private static function limit($options = array()){
+		protected static function limit($options = array()){
 			return (!empty($options) && ($limit = RaspArray::index($options, 'limit', false)) ? $limit : null);
 		}
 
-		private static function order_by($options = array()){
+		protected static function order_by($options = array()){
 			return (!empty($options) && ($order_by = RaspArray::index($options, 'order', false)) ? $order_by : null);
 		}
 
-		private static function offset($options = array()){
+		protected static function offset($options = array()){
 			return (!empty($options) && ($offset = RaspArray::index($options, 'offset', false)) ? $offset : null);
 		}
 
@@ -204,31 +215,32 @@
 
 		#Connection methods
 
-		public static function initilize(){
+		public static function class_name($options = null){
+			return (empty($options) ? self::$class_name : self::$class_name = RaspArray::index($options, 'class', __CLASS__));
 		}
 
-		public static function options(){
-
+		public static function initilize(){
 		}
 
 		public static function establish_connection($forcing = false){
 			try {
-				eval('$connection_params = ' . self::$class_name .'::$connection_params;');
-				if(empty($connection_params)) throw new RaspDatabaseParamsException;
-				eval('$db = (' . self::$class_name . '::is_connection_established() && !$forcing) ? ' . self::$class_name . '::$db : new self::$database_driver($connection_params);');
-				eval(self::$class_name . '::$db = $db;');
-				return $db;
-			} catch(RaspDatabaseParamsException $e) { RaspCatcher::add($e); }
+				eval('$connection_params = ' . self::class_name() .'::$connection_params;');
+				if(empty($connection_params)) $connection_params = self::$connection_params;
+				if(empty($connection_params)) throw new RaspActiveRecordException(self::EXCEPTION_MISSED_DATABASE_PARAMS);
+				$connection = (self::is_connection_established() && !$forcing ? self::$connections[self::class_name()] : self::$connections[self::class_name()] = new self::$database_driver($connection_params));
+				return $connection;
+			} catch(RaspActiveRecordException $e) { RaspCatcher::add($e); }
 		}
 
 		public static function close_connection(){
-			eval('$closing = ' . self::$class_name . '::$db->close();');
-			return $closing;
+			$returning = self::$connections[self::class_name()]->close();
+			if($returning) self::$connections[self::class_name()] = null;
+			return $returning;
 		}
 
 		public static function is_connection_established(){
-			eval('$established = !empty(' . self::$class_name . '::$db);');
-			return $established;
+			$connection = RaspArray::index(self::$connections, self::class_name(), null);
+			return !empty($connection);
 		}
 
 		#Validation
@@ -237,7 +249,17 @@
       return true;
 		}
 
+
 		#Other methods
+
+		public static function table_name(){
+			eval('$table_name = ' . self::class_name() . '::$table_name;');
+			if(empty($table_name)) $table_name = RaspString::tableize(self::$class_name);
+			return $table_name;
+		}
+
+		public static function options(){
+		}
 
 		public static function table_fields(){
 			if(empty(self::$table_fields)){
