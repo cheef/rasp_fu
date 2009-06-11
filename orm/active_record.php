@@ -31,6 +31,7 @@
 		const EXCEPTION_WRONG_FIND_MODE = "Wrong find mode, try others, like 'all' or 'first'";
 		const EXCEPTION_MISSED_ID = "Missed id param";
 		const EXCEPTION_MISSED_DATABASE_PARAMS = "Missed database connection params";
+		const EXCEPTION_NO_CONNECTION_WITH_DB = "Error, no connection with database";
 
 		public function __construct($params = array()){
 			if(!empty($params)) foreach($params as $attribute => $value) $this->set($attribute, $value);
@@ -147,7 +148,7 @@
 
 		#SQL constructor
 
-		public function q(){
+		public static function q(){
 			return RaspWhereExpression::create();
 		}
 
@@ -169,39 +170,42 @@
 
 		#CRUD
 
-		public static function create($params, $saving = true){
-			$object = new self::$class_name($params);
+		public static function create($params, $options = array()){
+			$saving = isset($options['save']) ? $options['save'] : true;
+			self::class_name($options);
+			eval('$object = new ' . self::class_name() . '($params);');
 			return ($saving ? $object->save() : $object);
 		}
 
 		public function save($attributes = array(), $validate = true){
       if(!empty($attributes)) foreach($attributes as $attribute => $value) $this->set($attribute, $value);
-      if($validate && $this->is_valid())
-        return ($this->has_id() ? $this->update($attributes) : $this->insert($attributes));
-      elseif(!$validate) return ($this->has_id() ? $this->update($attributes) : $this->insert($attributes));
-      else return false;
+
+      if($validate){
+      	if($this->is_valid()) return ($this->is_new_record() ? $this->insert() : $this->update());
+        else return false;
+      }
+      else return ($this->is_new_record() ? $this->insert() : $this->update());
 		}
 
-		public function update($attributes = array()){
+		protected function update($attributes = array()){
 			try {
-				self::initilize();
 				if(!empty($attributes)) foreach($attributes as $attribute => $value) $this->set($attribute, $value);
-				if(!self::establish_connection()) throw new RaspARConnectionException;
+				if(!self::establish_connection()) throw new RaspActiveRecordException(self::EXCEPTION_NO_CONNECTION_WITH_DB);
 				$strings_for_update = array();
 				foreach($this->attributes as $attribute => $value)
 					if(in_array($attribute, $this->only_table_attributes())) $strings_for_update[] = self::escape($attribute, '`') . ' = ' . self::escape($value);
-				return self::$db->query('UPDATE ' . self::$table_name . ' SET ' . join(',', $strings_for_update) . ' WHERE `id` = ' . $this->attributes['id']);
-			} catch(RaspARConnectionException $e){ RaspCatcher::add($e); }
+				$saved = self::$connections[self::class_name()]->query('UPDATE ' . self::table_name() . ' SET ' . join(',', $strings_for_update) . ' WHERE `id` = ' . $this->id);
+				return ($saved ? $this : false);
+			} catch(RaspActiveRecordException $e){ RaspCatcher::add($e); }
 		}
 
-		public function insert($attributes = array()){
+		protected function insert($attributes = array()){
 			try {
-				self::initilize();
 				if(!empty($attributes)) foreach($attributes as $attribute => $value) $this->set($attribute, $value);
-				if(!self::establish_connection()) throw new RaspARConnectionException;
-				$sql = "INSERT INTO " . self::$table_name . "(" . join(',', self::escape($this->only_table_attributes(), '`')) . ") VALUES (" . join(',', self::escape($this->only_table_values())) . ");";
-				return self::$db->query($sql);
-			} catch(RaspARConnectionException $e){ RaspCatcher::add($e); }
+				if(!self::establish_connection()) throw new RaspActiveRecordException(self::EXCEPTION_NO_CONNECTION_WITH_DB);
+				$sql = "INSERT INTO " . self::table_name() . "(" . join(',', self::escape($this->only_table_attributes(), '`')) . ") VALUES (" . join(',', self::escape($this->only_table_values())) . ");";
+				return self::$connections[self::class_name()]->query($sql);
+			} catch(RaspActiveRecordException $e){ RaspCatcher::add($e); }
 		}
 
     public function delete(){
@@ -262,14 +266,14 @@
 		}
 
 		public static function table_fields(){
-			if(empty(self::$table_fields)){
-				try {
-					if(!self::establish_connection()) throw new RaspARConnectionException;
-					$reponse_resource = self::$db->query('SHOW COLUMNS FROM ' . self::$table_name);
-					while($result = self::$db->fetch($reponse_resource)) self::$table_fields[] = RaspActiveField::create($result);
+			try {
+				if(empty(self::$table_fields)){
+					if(!self::establish_connection()) throw new RaspActiveRecordException(self::EXCEPTION_NO_CONNECTION_WITH_DB);
+					$reponse_resource = self::$connections[self::class_name()]->query('SHOW COLUMNS FROM ' . self::table_name());
+					while($result = self::$connections[self::class_name()]->fetch($reponse_resource)) self::$table_fields[] = RaspActiveField::create($result);
 					return self::$table_fields;
-				} catch(RaspARConnectionException $e){ RaspCatcher::add($e); }
-			} else return self::$table_fields;
+				} else return self::$table_fields;
+			} catch(RaspActiveRecordException $e){ RaspCatcher::add($e); }
 		}
 
 		public static function fields(){
@@ -307,10 +311,12 @@
 		}
 
 		public static function escape($target, $escaper = "'"){
-			self::establish_connection();
-			if(is_array($target)) foreach($target as $key => $element) $target[$key]  = $escaper . self::$db->escape($element) . $escaper;
-			else $target = $escaper . self::$db->escape($target) . $escaper;
-			return $target;
+			try {
+				if(!self::establish_connection()) throw new RaspActiveRecordException(self::EXCEPTION_NO_CONNECTION_WITH_DB);
+				if(is_array($target)) foreach($target as $key => $element) $target[$key]  = $escaper . self::$connections[self::class_name()]->escape($element) . $escaper;
+				else $target = $escaper . self::$connections[self::class_name()]->escape($target) . $escaper;
+				return $target;
+			} catch(RaspActiveRecordException $e){ RaspCatcher::add($e); }
 		}
 	}
 ?>
