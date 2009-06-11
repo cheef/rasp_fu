@@ -15,15 +15,20 @@
 
 	class RaspActiveRecord implements RaspModel {
 
-		public static $db = null;
 		protected static $connections = array();
 		protected static $class_name;
 		public static $connection_params = array();
 		public static $table_name, $table_fields = array(), $fields = array();
-		public static $database_driver = 'RaspDatabase';
-		public static $underscored = true;
-    public static $options = array('underscored' => true);
-    public static $per_page = 10;
+    public static $options = array(
+    	'underscored' => true,
+    	'database' => array(
+    		'driver' => 'RaspDatabase'
+    	),
+    	'pagination' => array(
+    		'per_page' => 10
+    	)
+    );
+
 		public $attributes;
 
 		const EXCEPTION_WRONG_FIND_MODE = "Wrong find mode, try others, like 'all' or 'first'";
@@ -44,7 +49,7 @@
 		}
 
 		public function set($attribute, $value){
-			eval("return \$this->" . (self::$underscored ? RaspString::underscore($attribute) : $attribute) . " = \$value;");
+			eval("return \$this->" . (self::$options['underscored'] ? RaspString::underscore($attribute) : $attribute) . " = \$value;");
 		}
 
 		#Find methods
@@ -134,14 +139,14 @@
 
     public static function paginate($page_num = 1, $options = array()){
     	self::class_name($options);
-      $options = array_merge($options, array('limit' => self::$per_page, 'offset' => (($page_num - 1) * self::$per_page)));
+      $options = array_merge($options, array('limit' => self::$options['pagination']['per_page'], 'offset' => (($page_num - 1) * self::$options['pagination']['per_page'])));
       return self::find('all', $options);
     }
 
     public static function pages($options = array()){
     	self::class_name($options);
       $records = self::find('count', $options);
-      return ceil($records/self::$per_page);
+      return ceil($records/self::$options['pagination']['per_page']);
     }
 
 		#SQL constructor
@@ -207,7 +212,7 @@
 		}
 
     public function delete(){
-      return self::$db->query("DELETE FROM " . self::$table_name . " WHERE `id` = " . $this->id);
+      return self::$connections[self::class_name()]->query("DELETE FROM " . self::table_name() . " WHERE `id` = " . $this->id);
     }
 
 		public function update_all($attributes){
@@ -229,7 +234,7 @@
 				eval('$connection_params = ' . self::class_name() .'::$connection_params;');
 				if(empty($connection_params)) $connection_params = self::$connection_params;
 				if(empty($connection_params)) throw new RaspActiveRecordException(self::EXCEPTION_MISSED_DATABASE_PARAMS);
-				$connection = (self::is_connection_established() && !$forcing ? self::$connections[self::class_name()] : self::$connections[self::class_name()] = new self::$database_driver($connection_params));
+				$connection = (self::is_connection_established() && !$forcing ? self::$connections[self::class_name()] : self::$connections[self::class_name()] = new self::$options['database']['driver']($connection_params));
 				return $connection;
 			} catch(RaspActiveRecordException $e) { RaspCatcher::add($e); }
 		}
