@@ -11,8 +11,6 @@
 	require_once RASP_ORM_PATH . 'sql_constructor.php';
 	require_once RASP_ORM_PATH . 'constructions/expression.php';
 
-	class RaspDatabaseParamsException extends RaspException { public $message = 'No connection params for database'; }
-	class RaspARConnectionException extends RaspException { public $message = 'No connection with database'; }
 	class RaspActiveRecordException extends RaspException {};
 
 	class RaspActiveRecord implements RaspModel {
@@ -88,9 +86,9 @@
 				->from(self::table_name())
 				->where(self::conditions($options))
 				->limit(1);
-				if(!self::establish_connection()) throw new RaspARConnectionException;
+				if(!self::establish_connection()) throw new RaspActiveRecordException(self::EXCEPTION_NO_CONNECTION_WITH_DB);
 				return RaspArray::first(self::$connections[self::class_name()]->fetch(self::$connections[self::class_name()]->query($q->to_sql())));
-			} catch(RaspARConnectionException $e){ RaspCatcher::add($e); }
+			} catch(RaspActiveRecordException $e){ RaspCatcher::add($e); }
 		}
 
 		public static function find_first($options = array()){
@@ -119,12 +117,12 @@
 		public static function find_by_sql($sql, $options = array()){
 			try {
 				self::class_name($options);
-				if(!self::establish_connection()) throw new RaspARConnectionException;
+				if(!self::establish_connection()) throw new RaspActiveRecordException(self::EXCEPTION_NO_CONNECTION_WITH_DB);
 				$returning = array();
 				$reponse_resource = self::$connections[self::class_name()]->query($sql);
 				eval('while($result = self::$connections[self::class_name()]->fetch($reponse_resource)) $returning[] = new ' . self::$class_name . '($result);');
 				return $returning;
-			} catch(RaspARConnectionException $e){ RaspCatcher::add($e); }
+			} catch(RaspActiveRecordException $e){ RaspCatcher::add($e); }
 		}
 
 		public static function find_by_constructor($options = array()){
