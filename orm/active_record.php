@@ -103,7 +103,7 @@
 				->from(self::table_name())
 				->where(self::conditions($options))
 				->limit(1);
-			return self::find_by_sql($q->to_sql());
+			return RaspArray::first(self::find_by_sql($q->to_sql()));
 		}
 
 		public static function find_all($options = array()){
@@ -248,6 +248,10 @@
 		public static function is_connection_established(){
 			$connection = RaspArray::index(self::$connections, self::class_name(), null);
 			return !empty($connection);
+		}
+
+		public static function connection($class_name){
+			return self::$connections[$class_name];
 		}
 
 		#Validation
