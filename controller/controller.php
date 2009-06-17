@@ -14,10 +14,21 @@
 			$this->method = $_SERVER['REQUEST_METHOD'];
 		}
 
-		protected function render($partial_name, $variables = array()){
+		public function render($options, $variables = array()){
+			if(RaspArray::is_not_empty($options, 'layout')) {
+				$center = $this->include_template(TPL_DIR . $options['partial']);
+				$template = $this->include_template(TPL_DIR . $options['layout'], array('center' => $center));
+			} else $template = $this->include_template(TPL_DIR . $options['partial']);
+			print $template;
+		}
+
+		public function include_template($path, $variables = array()){
+			ob_start();
 			extract($variables, EXTR_OVERWRITE);
-			$partial = include TPL_DIR . $partial_name;
-			exit;
+			include $path;
+			$template = ob_get_contents();
+			ob_end_clean();
+			return $template;
 		}
 
 		protected function redirect_to($url){

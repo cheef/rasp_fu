@@ -49,7 +49,7 @@
 		}
 
 		public function set($attribute, $value){
-			eval("return \$this->" . (self::$options['underscored'] ? RaspString::underscore($attribute) : $attribute) . " = \$value;");
+			eval("return \$this->" . (self::options('underscored') ? RaspString::underscore($attribute) : $attribute) . " = \$value;");
 		}
 
 		#Find methods
@@ -270,7 +270,10 @@
 			return $table_name;
 		}
 
-		public static function options(){
+		public static function options($option_name){
+			eval('$class_options = ' . self::class_name() . '::$options;');
+			$options = array_merge(self::$options, $class_options);
+			return RaspArray::index($options, $option_name, null);
 		}
 
 		public static function table_fields(){
