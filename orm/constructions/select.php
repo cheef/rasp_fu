@@ -3,12 +3,13 @@
   require_once RASP_TYPES_PATH . 'array.php';
   require_once RASP_ORM_PATH . 'constructions/elementary.php';
   require_once RASP_ORM_PATH . 'constructions/expression.php';
+  require_once RASP_ORM_PATH . 'constructions/interfaces/abstract_request.php';
   require_once RASP_TOOLS_PATH . 'catcher.php';
 	require_once RASP_PATH . 'exception.php';
 
   class RaspSelectException extends RaspException {};
 
-  class RaspSelect {
+  class RaspSelect extends RaspAbstractRequest {
 
     const EXCEPTION_WRONG_SELECT_PARAMS = 'Wrong params of select method, expected string of fields, option or array of fields';
     const EXCEPTION_WRONG_FROM_PARAMS = 'Wrong params of from method, expected string or array';
@@ -17,7 +18,7 @@
     const EXCEPTION_WRONG_LIMIT_TYPE = 'Wrong limit type, expected integer';
     const EXCEPTION_WRONG_OFFSET_TYPE = 'Wrong offset type, expected integer';
 
-    private static $elements = array('select', 'from', 'where', 'order', 'limit', 'offset');
+    protected $elements = array('select', 'from', 'where', 'order', 'limit', 'offset');
 
     public function __construct(){
       $this->select = RaspElementary::create()->construction('SELECT [fields]');
@@ -26,10 +27,6 @@
       $this->order = RaspElementary::create()->construction('ORDER BY [fields]');
       $this->limit = RaspElementary::create()->construction('LIMIT [limit]');
       $this->offset = RaspElementary::create()->construction('OFFSET [offset]');
-    }
-
-    public static function q(){
-      return RaspWhereExpression::create();
     }
 
     public function select($fields = 'all'){
@@ -98,12 +95,6 @@
         $this->offset->set($offset);
       } catch(RaspSelectException $e) { RaspCatcher::add($e); }
       return $this;
-    }
-
-    public function to_sql(){
-      $sql = array();
-      foreach(self::$elements as $element) $sql[] = $this->$element->make()->sql();
-      return join(' ', RaspArray::compact($sql));
     }
 
     public static function create(){

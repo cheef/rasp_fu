@@ -67,7 +67,7 @@
 			} catch (RaspActiveRecordException $e) { RaspCatcher::add($e); }
 		}
 
-		public static function find_by_id($id, $options = array()){
+		protected static function find_by_id($id, $options = array()){
 			try {
 				if(empty($id)) throw new RaspActiveRecordException(self::EXCEPTION_MISSED_ID);
 				self::class_name($options);
@@ -83,7 +83,7 @@
 			} catch (RaspActiveRecordException $e) { RaspCatcher::add($e); }
 		}
 
-		public static function find_count($options = array()){
+		protected static function find_count($options = array()){
 			try {
 				self::class_name($options);
 				$q = self::find('constructor');
@@ -96,7 +96,7 @@
 			} catch(RaspActiveRecordException $e){ RaspCatcher::add($e); }
 		}
 
-		public static function find_first($options = array()){
+		protected static function find_first($options = array()){
 			self::class_name($options);
 			$q = self::find('constructor');
 			$q->select('all')
@@ -106,7 +106,7 @@
 			return RaspArray::first(self::find_by_sql($q->to_sql()));
 		}
 
-		public static function find_all($options = array()){
+		protected static function find_all($options = array()){
 			self::class_name($options);
 
 			$q = self::find('constructor');
@@ -130,7 +130,7 @@
 			} catch(RaspActiveRecordException $e){ RaspCatcher::add($e); }
 		}
 
-		public static function find_by_constructor($options = array()){
+		protected static function find_by_constructor($options = array()){
 			self::class_name($options);
 			return RaspSQLConstructor::create('select');
 		}
@@ -206,6 +206,7 @@
 			try {
 				if(!empty($attributes)) foreach($attributes as $attribute => $value) $this->set($attribute, $value);
 				if(!self::establish_connection()) throw new RaspActiveRecordException(self::EXCEPTION_NO_CONNECTION_WITH_DB);
+
 				$sql = "INSERT INTO " . self::table_name() . "(" . join(',', self::escape($this->only_table_attributes(), '`')) . ") VALUES (" . join(',', self::escape($this->only_table_values())) . ");";
 				return self::$connections[self::class_name()]->query($sql);
 			} catch(RaspActiveRecordException $e){ RaspCatcher::add($e); }
