@@ -10,6 +10,7 @@
 	require_once RASP_ORM_PATH . 'interfaces/model.php';
 	require_once RASP_ORM_PATH . 'sql_constructor.php';
 	require_once RASP_ORM_PATH . 'constructions/expression.php';
+  require_once RASP_PATH . 'validation/validator_manager.php';
 
 	class RaspActiveRecordException extends RaspException {};
 
@@ -30,6 +31,8 @@
     );
 
 		public $attributes;
+    protected static $validate = array();
+    protected $errors;
 
 		const EXCEPTION_WRONG_FIND_MODE = "Wrong find mode, try others, like 'all' or 'first'";
 		const EXCEPTION_MISSED_ID = "Missed id param";
@@ -255,12 +258,37 @@
 			return self::$connections[$class_name];
 		}
 
+    #Attributes
+
+    public function attributes($attribute_name = null){
+      if(empty($attribute_name)) return $this->attributes;
+      return RaspArray::index($this->attributes, $attribute_name, null);
+    }
+    
 		#Validation
 
 		public function is_valid(){
-      return true;
+      return $this->validate() && !$this->has_errors();
 		}
 
+    public function validate(){
+      eval('$validate = ' . get_class($this) . '::$validate;');
+      foreach($validate as $attribute_name => $validate_options) $this->validate_attribute($attribute_name, $validate_options);
+      return true;
+    }
+
+    public function has_errors(){
+      return !empty($this->errors);
+    }
+
+    public function errors($attribute_name = null, $message = null){
+      return empty($attribute_name) ? $this->errors : $this->errors[$attribute_name][] = $message;
+    }
+
+    protected function validate_attribute($attribute_name, $validate_options){
+      $validator_manager = RaspValidatorManager::initilize($validate_options);
+      if(!$validator_manager->is_valid($this->attributes($attribute_name))) $this->errors[$attribute_name] = $validator_manager->messages();
+    }
 
 		#Other methods
 
