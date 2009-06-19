@@ -183,6 +183,12 @@
 			return ($saving ? $object->save() : $object);
 		}
 
+    public static function initilize($params, $options = array()){
+      self::class_name($options);
+			eval('$object = new ' . self::class_name() . '($params);');
+			return $object;
+		}
+
 		public function save($attributes = array(), $validate = true){
       if(!empty($attributes)) foreach($attributes as $attribute => $value) $this->set($attribute, $value);
 
@@ -228,9 +234,6 @@
 
 		public static function class_name($options = null){
 			return (empty($options) ? self::$class_name : self::$class_name = RaspArray::index($options, 'class', __CLASS__));
-		}
-
-		public static function initilize(){
 		}
 
 		public static function establish_connection($forcing = false){
