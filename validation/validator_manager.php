@@ -46,6 +46,7 @@
     protected function case_validator($rule_name, $rule_options, $value){
       try {
         if(!in_array($rule_name, array_keys(self::$available_rules))) throw new RaspValidatorManagerException(self::EXCEPTION_WRONG_RULE);
+
         if(!is_array($rule_options))
           $options = array_merge(self::$available_rules[$rule_name], array($rule_name => $rule_options));
         else $options = array_merge(self::$available_rules[$rule_name], $rule_options);
@@ -56,11 +57,18 @@
               return $this->messages[] = $options['message'];
             } else return true;
           case 'number':
+            if(empty($value)) return true;
             if(!is_numeric($value)){
               return $this->messages[] = $options['message'];
             } else return true;
           case 'email':
-            return true;
+            if(empty($value)) return true;
+            $validator = RaspPatternValidator::initilize(array(
+              'pattern' => '"^[a-zA-Z][\w\.-]*[a-zA-Z0-9]@[a-zA-Z0-9][\w\.-]*[a-zA-Z0-9]\.[a-zA-Z][a-zA-Z\.]*[a-zA-Z]$"'
+            ));
+            if(!$validator->is_valid($value)){
+              return $this->messages[] = $options['message'];
+            } else return true;
           case 'min':
             return true;
           case 'max':
