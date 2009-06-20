@@ -1,16 +1,12 @@
 <?php
 
-	require_once RASP_TYPES_PATH . 'string.php';
-	require_once RASP_TYPES_PATH . 'array.php';
-	require_once RASP_TYPES_PATH . 'hash.php';
-	require_once RASP_RESOURCES_PATH . 'database.php';
-	require_once RASP_PATH . 'exception.php';
-	require_once RASP_TOOLS_PATH . 'catcher.php';
-	require_once RASP_ORM_PATH . 'active_field.php';
-	require_once RASP_ORM_PATH . 'interfaces/model.php';
-	require_once RASP_ORM_PATH . 'sql_constructor.php';
-	require_once RASP_ORM_PATH . 'constructions/expression.php';
-  require_once RASP_PATH . 'validation/validator_manager.php';
+  rasp_lib(
+    'types.string', 'types.array', 'types.hash',
+    'resources.database',
+    'exception', 'tools.catcher',
+    'orm.interfaces.model', 'orm.active_field', 'orm.sql_constructor', 'orm.constructions.expression',
+    'validation.validator_manager'
+  );
 
 	class RaspActiveRecordException extends RaspException {};
 

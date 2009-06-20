@@ -1,6 +1,9 @@
 <?php
 
-	require_once RASP_ORM_PATH . 'constructions/select.php';
+  rasp_lib(
+    'orm.constructions.select',
+    'exception', 'tools.catcher'
+  );
 
   class RaspSQLConstructorException extends RaspException {};
 

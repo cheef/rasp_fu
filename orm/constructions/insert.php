@@ -1,11 +1,10 @@
 <?php
 
-  require_once RASP_TYPES_PATH . 'array.php';
-  require_once RASP_ORM_PATH . 'constructions/elementary.php';
-  require_once RASP_ORM_PATH . 'constructions/expression.php';
-  require_once RASP_ORM_PATH . 'constructions/interfaces/abstract_request.php';
-  require_once RASP_TOOLS_PATH . 'catcher.php';
-	require_once RASP_PATH . 'exception.php';
+  rasp_lib(
+    'types.array',
+    'orm.constructions.elementary', 'orm.constructions.expression', 'orm.constructions.interfaces.abstract_request',
+    'exception', 'tools.catcher'
+  );
 
   class RaspInsertException extends RaspException {};
 

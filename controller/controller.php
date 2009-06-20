@@ -1,6 +1,8 @@
 <?php
 
-	require_once RASP_CONTROLLERS_PATH . 'abstract_controller.php';
+  rasp_lib(
+    'controller.abstract_controller'
+  );
 
 	class RaspController extends RaspAbstractController {
 

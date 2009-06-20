@@ -1,7 +1,8 @@
 <?php
 
-	require_once RASP_TYPES_PATH . 'abstract_type.php';
-	require_once RASP_TYPES_PATH . 'array.php';
+  rasp_lib(
+    'types.abstract_type', 'types.array'
+  );
 
 	class RaspCollection extends RaspAbstractType {
 

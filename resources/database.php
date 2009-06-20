@@ -1,9 +1,10 @@
 <?php
 
-	require_once RASP_RESOURCES_PATH . 'abstract_resource.php';
-	require_once RASP_TYPES_PATH . 'array.php';
-	require_once RASP_PATH . 'exception.php';
-	require_once RASP_TOOLS_PATH . 'catcher.php';
+  rasp_lib(
+    'types.array',
+    'resources.abstract_resource',
+    'exception', 'tools.catcher'
+  );
 
 	class RaspDatabaseConnectionException extends RaspException { public $message = "There is connection problem, check settings"; }
 	class RaspDatabaseQueryException extends RaspException {

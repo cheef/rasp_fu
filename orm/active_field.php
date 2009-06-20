@@ -1,6 +1,6 @@
 <?php
-	require_once RASP_PATH . 'abstract_object.php';
-	require_once RASP_TYPES_PATH . 'string.php';
+
+  rasp_lib('abstract_object', 'types.string');
 
 	class RaspActiveField extends RaspAbstractObject {
 

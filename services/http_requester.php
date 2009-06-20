@@ -1,11 +1,11 @@
 <?php
 
-	require_once RASP_SERVICES_PATH . 'abstract_service.php';
-	require_once RASP_TOOLS_PATH . 'http_response.php';
-	require_once RASP_TOOLS_PATH . 'http_header.php';
-	require_once RASP_TYPES_PATH . 'array.php';
-	require_once RASP_TOOLS_PATH . 'catcher.php';
-	require_once RASP_PATH . 'exception.php';
+  rasp_lib(
+    'types.array',
+    'tools.http_response', 'tools.http_header',
+    'services.abstract_service',
+    'exception', 'tools.catcher'
+  );
 
 	class RaspCurlInitException extends RaspException { public $message = "Curl initialization failed"; }
 	class RaspCurlExecutingException extends RaspException { public $message = "Curl executing failed"; }

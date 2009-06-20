@@ -1,5 +1,8 @@
 <?php
-	require_once RASP_RESOURCES_PATH . 'abstract_resource.php';
+
+  rasp_lib(
+    'resources.abstract_resource'
+  );
 
 	class RaspDate extends RaspAbstractResource {
 

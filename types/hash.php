@@ -1,8 +1,9 @@
 <?php
 
-	require_once RASP_TYPES_PATH . 'abstract_type.php';
-	require_once RASP_PATH . 'exception.php';
-	require_once RASP_TOOLS_PATH . 'catcher.php';
+  rasp_lib(
+    'types.abstract_type',
+    'exception', 'tools.catcher'
+  );
 
 	class RaspHashUnrecognizedTypeException extends RaspException { public $message = "Unrecognized type, method map work with arrays and objects"; }
 

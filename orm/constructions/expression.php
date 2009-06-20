@@ -1,7 +1,9 @@
 <?php
 
-  require_once RASP_TYPES_PATH . 'array.php';
-  require_once RASP_ORM_PATH . 'constructions/elementary.php';
+  rasp_lib(
+    'types.array',
+    'orm.constructions.elementary'
+  );
 
   class RaspWhereExpression {
 

@@ -1,8 +1,9 @@
 <?php
 
-  require_once RASP_PATH . 'exception.php';
-  require_once RASP_TOOLS_PATH . 'catcher.php';
-  require_once RASP_PATH . 'validation/pattern_validator.php';
+  rasp_lib(
+    'validation.pattern_validator',
+    'exception', 'tools.catcher'
+  );
 
   class RaspValidatorManagerException extends RaspException {};
 

@@ -1,11 +1,8 @@
 <?php
 
-	/**
-	 * @author cheef, simsalabim
-	 * Adding array functionality
-	 */
-
-	require_once RASP_TYPES_PATH . 'abstract_type.php';
+  rasp_lib(
+    'types.abstract_type'
+  );
 
 	class RaspArray extends RaspAbstractType {
 

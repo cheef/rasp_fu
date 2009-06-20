@@ -1,8 +1,10 @@
 <?php
-	require_once RASP_RESOURCES_PATH . 'abstract_resource.php';
-	require_once RASP_TYPES_PATH . 'array.php';
-	require_once RASP_TOOLS_PATH . 'catcher.php';
-	require_once RASP_PATH . 'exception.php';
+
+  rasp_lib(
+    'types.array',
+    'resources.abstract_resource',
+    'exception', 'tools.catcher'
+  );
 
 	class RaspFileException extends RaspException {};
 

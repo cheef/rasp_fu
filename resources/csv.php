@@ -1,7 +1,9 @@
 <?php
-	require_once RASP_RESOURCES_PATH . 'abstract_resource.php';
-	require_once RASP_RESOURCES_PATH . 'file.php';
-	require_once RASP_TYPES_PATH . 'string.php';
+
+  rasp_lib(
+    'types.string',
+    'resources.abstract_resource', 'resources.file'
+  );
 
 	class RaspCSV extends RaspAbstractResource {
 

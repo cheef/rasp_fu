@@ -1,7 +1,10 @@
 <?php
-	require_once RASP_SERVICES_PATH . 'abstract_service.php';
-	require_once RASP_RESOURCES_PATH . 'socket.php';
-	require_once RASP_TYPES_PATH . 'array.php';
+
+  rasp_lib(
+    'types.array',
+    'resources.socket',
+    'services.abstract_service'
+  );
 
 	class RaspAmazonRequester extends RaspAbstractService {
 

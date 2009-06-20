@@ -1,6 +1,9 @@
 <?php
-	require_once RASP_RESOURCES_PATH . 'abstract_resource.php';
-	require_once RASP_TYPES_PATH . 'array.php';
+
+  rasp_lib(
+    'types.array',
+    'resources.abstract_resource'
+  );
 
 	class RaspMemory extends RaspAbstractResource {
 

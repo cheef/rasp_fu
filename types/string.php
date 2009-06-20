@@ -1,6 +1,8 @@
 <?php
 
-	require_once RASP_TYPES_PATH . 'abstract_type.php';
+  rasp_lib(
+    'types.abstract_type'
+  );
 
 	class RaspString extends RaspAbstractType {
 

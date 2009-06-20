@@ -1,5 +1,9 @@
 <?php
-	require_once RASP_TOOLS_PATH . 'abstract_tool.php';
+
+  rasp_lib(
+    'tools.abstract_tool'
+  );
+
 	require_once RASP_VENDOR_PATH . 'minixml-1.3.8' . DIRECTORY_SEPARATOR . 'minixml.inc.php';
 
 	class RaspXML extends RaspAbstractTool {

@@ -1,5 +1,10 @@
 <?php
 
+  rasp_lib(
+    'types.array',
+    'exception', 'tools.catcher'
+  );
+
   require_once RASP_TYPES_PATH . 'array.php';
   require_once RASP_TOOLS_PATH . 'catcher.php';
 	require_once RASP_PATH . 'exception.php';

@@ -1,6 +1,9 @@
 <?php
-	require_once RASP_TOOLS_PATH . 'abstract_tool.php';
-	require_once RASP_RESOURCES_PATH . 'file.php';
+
+  rasp_lib(
+    'tools.abstract_tool',
+    'resources.file'
+  );
 
 	class RaspLogger extends RaspAbstractTool{
 

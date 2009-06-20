@@ -1,7 +1,9 @@
 <?php
-	require_once RASP_TOOLS_PATH . 'abstract_tool.php';
-	require_once RASP_TOOLS_PATH . 'http_request_builder.php';
-	require_once RASP_TYPES_PATH . 'array.php';
+
+  rasp_lib(
+    'types.array',
+    'tools.abstract_tool', 'tools.http_request_builder'
+  );
 
 	class RaspHttpHeader extends RaspAbstractService {
 

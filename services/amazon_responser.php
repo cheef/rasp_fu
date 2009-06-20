@@ -1,6 +1,10 @@
 <?php
-	require_once RASP_SERVICES_PATH . 'abstract_service.php';
-	require_once RASP_VENDOR_PATH . 'minixml-1.3.8' . DIRECTORY_SEPARATOR . 'minixml.inc.php';
+
+  rasp_lib(
+    'services.abstract_service'
+  );
+
+  require_once RASP_VENDOR_PATH . 'minixml-1.3.8' . DIRECTORY_SEPARATOR . 'minixml.inc.php';
 
 	class RaspAmazonResponser extends RaspAbstractService {
 
