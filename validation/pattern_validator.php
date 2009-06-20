@@ -29,8 +29,6 @@
         if(empty($this->value)) throw new RaspPatternValidatorException(self::EXCEPTION_MISSED_VALUE);
         if(empty($this->pattern)) throw new RaspPatternValidatorException(self::EXCEPTION_MISSED_PATTERN);
         preg_match($this->pattern, $this->value, $matches);
-        RaspDebug::show($matches);
-        RaspDebug::show($this->pattern);
         return !empty($matches);
       } catch (RaspPatternValidatorException $e) { RaspCatcher::add($e); }
     }
