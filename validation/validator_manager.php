@@ -53,30 +53,35 @@
         
         switch($rule_name){
           case 'required':
-            if(empty($value)) {
-              return $this->messages[] = $options['message'];
-            } else return true;
+            if(!empty($value)) return true;
+            else return $this->messages[] = $options['message'];
           case 'number':
-            if(empty($value)) return true;
-            if(!is_numeric($value)){
-              return $this->messages[] = $options['message'];
-            } else return true;
+            if(empty($value) || is_numeric($value)) return true;
+            else return $this->messages[] = $options['message'];
           case 'email':
-            if(empty($value)) return true;
-            $validator = RaspPatternValidator::initilize(array(
-              'pattern' => '"^[a-zA-Z][\w\.-]*[a-zA-Z0-9]@[a-zA-Z0-9][\w\.-]*[a-zA-Z0-9]\.[a-zA-Z][a-zA-Z\.]*[a-zA-Z]$"'
-            ));
-            if(!$validator->is_valid($value)){
-              return $this->messages[] = $options['message'];
-            } else return true;
+            if(empty($value) || $this->validate_email($value)) return true;
+            else return $this->messages[] = $options['message'];
           case 'min':
-            return true;
+            if(empty($value) || !is_numeric($value)) return true;
+            else return ($value >= $options['min']) ? true : $this->messages[] = $this->proc_message($options['message'], 'min', $value);
           case 'max':
-            return true;
+            if(empty($value) || !is_numeric($value)) return true;
+            else return ($value <= $options['max']) ? true : $this->messages[] = $this->proc_message($options['message'], 'max', $value);
           case 'credit_card':
+            if(empty($value)) return true;
             return true;
         }
       } catch (RaspValidatorManagerException $e) { RaspCatcher::add($e); }
+    }
+
+    protected function proc_message($message, $mask, $replacement){
+      return str_replace('%' . $mask . '%', $replacement, $message);
+    }
+
+    protected function validate_email($email){
+      return RaspPatternValidator::initilize(array(
+        'pattern' => '"^[a-zA-Z][\w\.-]*[a-zA-Z0-9]@[a-zA-Z0-9][\w\.-]*[a-zA-Z0-9]\.[a-zA-Z][a-zA-Z\.]*[a-zA-Z]$"'
+      ))->is_valid($email);
     }
 
     protected function initilize_validator_by_pattern($pattern, $message, $value){
