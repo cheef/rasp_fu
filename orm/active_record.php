@@ -18,6 +18,7 @@
 		public static $table_name, $table_fields = array(), $fields = array();
     public static $options = array(
     	'underscored' => true,
+    	'id_field' => 'id',
     	'database' => array(
     		'driver' => 'RaspDatabase'
     	),
@@ -202,7 +203,7 @@
 				$strings_for_update = array();
 				foreach($this->attributes as $attribute => $value)
 					if(in_array($attribute, $this->only_table_attributes())) $strings_for_update[] = self::escape($attribute, '`') . ' = ' . self::escape($value);
-				$saved = self::$connections[self::class_name()]->query('UPDATE ' . self::table_name() . ' SET ' . join(',', $strings_for_update) . ' WHERE `id` = ' . $this->id);
+				$saved = self::$connections[self::class_name()]->query('UPDATE ' . self::table_name() . ' SET ' . join(',', $strings_for_update) . ' WHERE `' . self::options('id_field') . '` = ' . $this->attributes(self::options('id_field')));
 				return ($saved ? $this : false);
 			} catch(RaspActiveRecordException $e){ RaspCatcher::add($e); }
 		}
@@ -218,7 +219,7 @@
 		}
 
     public function delete(){
-      return self::$connections[self::class_name()]->query("DELETE FROM " . self::table_name() . " WHERE `id` = " . $this->id);
+      return self::$connections[self::class_name()]->query("DELETE FROM " . self::table_name() . " WHERE `" . self::options('id_field') . "` = " . $this->id);
     }
 
 		public function update_all($attributes){
@@ -263,7 +264,7 @@
       if(empty($attribute_name)) return $this->attributes;
       return RaspArray::index($this->attributes, $attribute_name, null);
     }
-    
+
 		#Validation
 
 		public function is_valid(){
@@ -300,7 +301,7 @@
 		public static function options($option_name){
 			eval('$class_options = ' . self::class_name() . '::$options;');
 			$options = array_merge(self::$options, $class_options);
-			return RaspArray::index($options, $option_name, null);
+			return $options[$option_name];
 		}
 
 		public static function table_fields(){
@@ -308,7 +309,10 @@
 				if(empty(self::$table_fields)){
 					if(!self::establish_connection()) throw new RaspActiveRecordException(self::EXCEPTION_NO_CONNECTION_WITH_DB);
 					$reponse_resource = self::$connections[self::class_name()]->query('SHOW COLUMNS FROM ' . self::table_name());
-					while($result = self::$connections[self::class_name()]->fetch($reponse_resource)) self::$table_fields[] = RaspActiveField::create($result);
+					while($result = self::$connections[self::class_name()]->fetch($reponse_resource)) {
+						$result = array_merge($result, array('underscored' => self::options('underscored')));
+						self::$table_fields[] = RaspActiveField::create($result);
+					}
 					return self::$table_fields;
 				} else return self::$table_fields;
 			} catch(RaspActiveRecordException $e){ RaspCatcher::add($e); }
@@ -335,7 +339,8 @@
     }
 
 		public function has_id(){
-			return isset($this->attributes['id']) && !empty($this->attributes['id']);
+			$id = $this->attributes(self::options('id_field'));
+			return !empty($id);
 		}
 
 		public function attributes_names(){

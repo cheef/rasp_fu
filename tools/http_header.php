@@ -5,7 +5,7 @@
     'tools.abstract_tool', 'tools.http_request_builder'
   );
 
-	class RaspHttpHeader extends RaspAbstractService {
+	class RaspHttpHeader extends RaspAbstractTool {
 
 		public $attributes = array(), $url, $method, $protocol, $content, $content_type, $request;
 
