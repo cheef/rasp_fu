@@ -18,9 +18,9 @@
 
 		public function render($options, $variables = array()){
 			if(RaspArray::is_not_empty($options, 'layout')) {
-				$center = $this->include_template(TPL_DIR . $options['partial']);
+				$center = $this->include_template(TPL_DIR . $options['partial'], $variables);
 				$template = $this->include_template(TPL_DIR . $options['layout'], array('center' => $center));
-			} else $template = $this->include_template(TPL_DIR . $options['partial']);
+			} else $template = $this->include_template(TPL_DIR . $options['partial'], $variables);
 			print $template;
 		}
 
