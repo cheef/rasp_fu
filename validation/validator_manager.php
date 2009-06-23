@@ -12,8 +12,8 @@
     const EXCEPTION_WRONG_OPTION = 'Wrong option for validator manager';
     const EXCEPTION_WRONG_RULE = 'Wrong validation rule';
 
-    protected static $available_options = array('patters', 'rules');
-    protected $patterns = array(), $rules = array(), $messages = array();
+    protected static $available_options = array('patterns', 'rules', 'object', 'method');
+    protected $patterns = array(), $rules = array(), $messages = array(), $object = null;
 
     protected static $available_rules = array(
       'required' => array('message' => 'This field is required'),
@@ -21,7 +21,9 @@
       'email' => array('message' => 'Please enter a valid email address'),
       'max' => array('message' => 'Please enter a value less than or equal to %max%'),
       'min' => array('message' => 'Please enter a value greater than or equal to %min%'),
-      'credit_card' => array('message' => 'Please enter a valid credit card number')
+      'credit_card' => array('message' => 'Please enter a valid credit card number'),
+      'method' => array('message' => 'Custom message'),
+      'unique' => array('message' => 'This value is used')
     );
 
     public function __construct($options = array()){
@@ -50,7 +52,6 @@
         if(!is_array($rule_options))
           $options = array_merge(self::$available_rules[$rule_name], array($rule_name => $rule_options));
         else $options = array_merge(self::$available_rules[$rule_name], $rule_options);
-        
         switch($rule_name){
           case 'required':
             if(!empty($value)) return true;
@@ -70,6 +71,17 @@
           case 'credit_card':
             if(empty($value)) return true;
             return true;
+          case 'unique':
+          	if(empty($value)) return true;
+          	else {
+          		return true;
+          	}
+          case 'method':
+          	if(empty($value)) return true;
+          	else {
+          		eval('$result = $this->object->' . $options['name'] . '($value);');
+          		return ($result ? true : ($this->messages[] = $this->proc_message($options['message'], 'unique', $value)));
+          	}
         }
       } catch (RaspValidatorManagerException $e) { RaspCatcher::add($e); }
     }

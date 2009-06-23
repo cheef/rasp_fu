@@ -286,6 +286,7 @@
     }
 
     protected function validate_attribute($attribute_name, $validate_options){
+    	$validate_options = array_merge($validate_options, array('object' => $this));
       $validator_manager = RaspValidatorManager::initilize($validate_options);
       if(!$validator_manager->is_valid($this->attributes($attribute_name))) $this->errors[$attribute_name] = $validator_manager->messages();
     }
