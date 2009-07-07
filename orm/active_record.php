@@ -210,9 +210,8 @@
 
 		protected function insert($attributes = array()){
 			try {
-				if(!empty($attributes)) foreach($attributes as $attribute => $value) $this->set($attribute, $value);
+				if(!empty($attributes)) foreach($attributes as $attribute => $value) $this->set($attribute, $value);        
 				if(!self::establish_connection()) throw new RaspActiveRecordException(self::EXCEPTION_NO_CONNECTION_WITH_DB);
-
 				$sql = "INSERT INTO " . self::table_name() . "(" . join(',', self::escape($this->only_table_attributes(), '`')) . ") VALUES (" . join(',', self::escape($this->only_table_values())) . ");";
 				return self::$connections[self::class_name()]->query($sql);
 			} catch(RaspActiveRecordException $e){ RaspCatcher::add($e); }
@@ -248,6 +247,12 @@
 			if($returning) self::$connections[self::class_name()] = null;
 			return $returning;
 		}
+
+    public static function close_all_connections(){
+      foreach(self::$connections as $connection) $connection->close();
+      self::$connections = null;
+      return true;
+    }
 
 		public static function is_connection_established(){
 			$connection = RaspArray::index(self::$connections, self::class_name(), null);
@@ -307,20 +312,21 @@
 
 		public static function table_fields(){
 			try {
-				if(empty(self::$table_fields)){
+        if(RaspArray::is_empty(self::$table_fields, self::class_name())){          
 					if(!self::establish_connection()) throw new RaspActiveRecordException(self::EXCEPTION_NO_CONNECTION_WITH_DB);
 					$reponse_resource = self::$connections[self::class_name()]->query('SHOW COLUMNS FROM ' . self::table_name());
 					while($result = self::$connections[self::class_name()]->fetch($reponse_resource)) {
 						$result = array_merge($result, array('underscored' => self::options('underscored')));
-						self::$table_fields[] = RaspActiveField::create($result);
+						self::$table_fields[self::class_name()][] = RaspActiveField::create($result);
 					}
-					return self::$table_fields;
-				} else return self::$table_fields;
+					return self::$table_fields[self::class_name()];
+				} else return self::$table_fields[self::class_name()];
 			} catch(RaspActiveRecordException $e){ RaspCatcher::add($e); }
 		}
 
 		public static function fields(){
-			return (empty(self::$fields) ? RaspHash::map(self::table_fields(), 'field') : self::$fields);
+      return (RaspArray::is_not_empty(self::$table_fields, self::class_name()) ?
+        RaspHash::map(self::$table_fields[self::class_name()], 'field') : RaspHash::map(self::table_fields(), 'field'));
 		}
 
 		public function only_table_attributes(){
