@@ -17,7 +17,7 @@
 		 * Default request options, can be edited
 		 * @var Hash
 		 */
-		public static $default_requester_options = array('port' => 80, 'timeout' => 60);
+		public static $default_requester_options = array('timeout' => 60);
 
 		/**
 		 * Curl resource
@@ -64,45 +64,79 @@
 		 * @param Hash $options
 		 */
 		public function __construct($options = array()){
-			$request_options = array_merge(self::$default_requester_options, $options);
-
 			try {
 				if(!$this->handler = curl_init()){
 					throw new RaspException('CURL error #' . curl_errno($this->handler) . ' - ' . curl_error($this->handler));
 				}
+				$this->configure($options);
 			} catch(RaspException $e) { RaspCatcher::add($e); }
+		}
+
+		/**
+		 * Setup request params
+		 * @param Hash $options
+		 */
+		private function configure($options = array()){
+			$request_options = RaspHash::merge(self::$default_requester_options, $options);
 
 			$this->set(array(
-				CURLOPT_PORT => RaspArray::delete($request_options, 'port'),
 				CURLOPT_RETURNTRANSFER => true,
-				CURLOPT_CONNECTTIMEOUT => RaspArray::delete($request_options, 'timeout'),
+				CURLOPT_CONNECTTIMEOUT => RaspHash::delete($request_options, 'timeout'),
 				CURLOPT_HEADER => true,
 				CURLOPT_AUTOREFERER => true
 			));
 
-			if(RaspHash::is_not_blank($request_options, 'auth_basic')) {
+			/**
+			 * Port
+			 */
+			if(RaspHash::is_not_empty($request_options, 'port'))
+				$this->set(array(CURLOPT_PORT => RaspHash::delete($request_options, 'port')));
+
+			/**
+			 * Basic authentification
+			 */
+			if(RaspHash::is_not_empty($request_options, 'auth_basic')) {
 				$this->set(array(CURLOPT_HTTPAUTH => CURLAUTH_BASIC));
-				$this->set(array(CURLOPT_USERPWD => $request_options['auth_basic']));
+				$this->set(array(CURLOPT_USERPWD => RaspHash::delete($request_options, 'auth_basic')));
 			}
 
-			if(RaspHash::is_not_blank($request_options, 'redirect')) $this->set(array(CURLOPT_FOLLOWLOCATION => true));
+			/**
+			 * Follow redirect
+			 */
+			if(RaspHash::is_not_blank($request_options, 'redirect') && RaspHash::delete($request_options, 'redirect') === true)
+				$this->set(array(CURLOPT_FOLLOWLOCATION => true));
 
+			/**
+			 * Set custom headers
+			 */
 			if(RaspHash::is_not_blank($request_options, 'headers'))
 				$this->set(array(CURLOPT_HTTPHEADER => RaspHttpHeader::create(array(
-					'attributes' => RaspArray::delete($request_options, 'headers')))->to_curl_strings())
+					'attributes' => RaspHash::delete($request_options, 'headers')))->to_curl_strings())
 				);
 
-			if(RaspHash::is_not_blank($request_options, 'post')){
+			/**
+			 * Post request
+			 */
+			if(RaspHash::is_not_blank($request_options, 'post') && $request_options['post'] === true)
 				$this->set(array(CURLOPT_POST => 1));
-				if(RaspHash::is_not_blank($request_options, 'data')){
-					$this->set(array(CURLOPT_POSTFIELDS => RaspArray::delete($request_options, 'data')));
+
+			/**
+			 * Request data
+			 */
+			if(RaspHash::is_not_empty($request_options, 'data')){
+				if(RaspHash::is_not_blank($request_options, 'post') && $request_options['post'] === true){
+					$this->set(array(CURLOPT_POSTFIELDS => RaspHash::delete($request_options, 'data')));
+				} else {
+					$this->data = RaspHash::delete($request_options, 'data');
 				}
-			} elseif(RaspHash::is_not_blank($request_options, 'data')) $this->data = RaspArray::delete($request_options, 'data');
+			}
 
+			/**
+			 * Cookies
+			 */
 			if(RaspHash::is_not_blank($request_options, 'cookies'))
-				$this->set(array(CURLOPT_COOKIE => RaspArray::delete($request_options, 'cookies')));
+				$this->set(array(CURLOPT_COOKIE => RaspHash::delete($request_options, 'cookies')));
 		}
-
 		/**
 		 * Sending request and returning response
 		 * @param String $url
