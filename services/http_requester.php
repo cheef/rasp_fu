@@ -7,8 +7,16 @@
     'exception', 'tools.catcher'
   );
 
+	/**
+	 * Class for simply request pages uses curl
+	 * @author Ivan Garmatenko <cheef.che@gmail.com>
+	 */
 	class RaspHttpRequester extends RaspAbstractService {
 
+		/**
+		 * Default request options, can be edited
+		 * @var Hash
+		 */
 		public static $default_requester_options = array('port' => 80, 'timeout' => 60);
 
 		/**
@@ -17,13 +25,17 @@
 		 */
 		private $handler = null;
 
-		private $get_data = '';
-
 		/**
 		 * Request options
 		 * @var Hash
 		 */
-		public $options = array();
+		private $options = array();
+
+		/**
+		 * Request (query string)
+		 * @var String
+		 */
+		private $data = null;
 
 		/**
 		 * Initializing and sending request
@@ -68,22 +80,27 @@
 				CURLOPT_AUTOREFERER => true
 			));
 
-			if(RaspHash::get($request_options, 'auth_basic', false)) {
+			if(RaspHash::is_not_blank($request_options, 'auth_basic')) {
 				$this->set(array(CURLOPT_HTTPAUTH => CURLAUTH_BASIC));
 				$this->set(array(CURLOPT_USERPWD => $request_options['auth_basic']));
 			}
 
-			if(RaspHash::get($request_options, 'redirect', false)) $this->set(array(CURLOPT_FOLLOWLOCATION => true));
+			if(RaspHash::is_not_blank($request_options, 'redirect')) $this->set(array(CURLOPT_FOLLOWLOCATION => true));
 
-			if(RaspHash::get($request_options, 'headers', false))
-				$this->set(array(CURLOPT_HTTPHEADER => RaspHttpHeader::create(array('attributes' => RaspArray::delete($request_options, 'headers')))->to_curl_strings()));
+			if(RaspHash::is_not_blank($request_options, 'headers'))
+				$this->set(array(CURLOPT_HTTPHEADER => RaspHttpHeader::create(array(
+					'attributes' => RaspArray::delete($request_options, 'headers')))->to_curl_strings())
+				);
 
-			if(RaspHash::get($request_options, 'post', false)){
+			if(RaspHash::is_not_blank($request_options, 'post')){
 				$this->set(array(CURLOPT_POST => 1));
-				if(RaspHash::get($request_options, 'data', false)) $this->set(array(CURLOPT_POSTFIELDS => RaspArray::delete($request_options, 'data')));
-			} elseif(RaspHash::get($request_options, 'data', false)) $this->get_data = RaspArray::delete($request_options, 'data');
+				if(RaspHash::is_not_blank($request_options, 'data')){
+					$this->set(array(CURLOPT_POSTFIELDS => RaspArray::delete($request_options, 'data')));
+				}
+			} elseif(RaspHash::is_not_blank($request_options, 'data')) $this->data = RaspArray::delete($request_options, 'data');
 
-			if(RaspHash::get($request_options, 'cookies', false)) $this->set(array(CURLOPT_COOKIE => RaspArray::delete($request_options, 'cookies')));
+			if(RaspHash::is_not_blank($request_options, 'cookies'))
+				$this->set(array(CURLOPT_COOKIE => RaspArray::delete($request_options, 'cookies')));
 		}
 
 		/**
@@ -92,7 +109,7 @@
 		 * @return RaspHttpResponse
 		 */
 		public function send($url){
-			$this->set(array(CURLOPT_URL => trim($url . (empty($this->get_data) ? '' : '?' . $this->get_data))));
+			$this->set(array(CURLOPT_URL => trim($url . (empty($this->data) ? '' : '?' . $this->data))));
 			
 			try {
 				if(!($response = $this->request())) {

@@ -20,7 +20,7 @@
 			$backtrace = RaspArray::first(empty($backtrace) ? debug_backtrace() : $backtrace);
 			print '<strong>' . $backtrace['file'] . '</strong>&nbsp;(line <strong>' . $backtrace['line'] . '</strong>)';
 			print '<pre>';
-			print_r($variable);
+			var_dump($variable);
 			print '</pre>';
 		}
 	}
