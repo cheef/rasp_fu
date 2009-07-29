@@ -6,7 +6,7 @@
 		public function add($exception, $options = array()){
 			$options = array_merge(self::$default_options, $options);
 			self::$exceptions[] = $exception;
-			if($options['die']) die(self::show());
+			if($options['die']) throw $exception;
 			else return false;
 		}
 

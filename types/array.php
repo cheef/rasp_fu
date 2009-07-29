@@ -61,7 +61,7 @@
 		public static function index($array, $index, $returning = false){
 			if(isset($array[$index]) && !empty($array[$index])) return $array[$index];
 			return $returning;
-		}
+		}		
 
 		/**
 		 * @return array('key' => $key, 'value' => $value) associative array with keys 'key' and 'value' containing sequentively key and value of searching element of input array
