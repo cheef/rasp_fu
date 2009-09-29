@@ -1,29 +1,44 @@
 <?php
 
-  rasp_lib(
-    'types.abstract_type'
-  );
+	/**
+	 * This class provides functionality to work with arrays
+	 * @author Ivan Garmatenko <cheef.che@gmail.com>
+	 * $Id$
+	 */
+	
+	rasp_lib('types.abstract_type');
 
 	class RaspArray extends RaspAbstractType {
 
+		/**
+		 * Get array keys
+		 * @param Array || Hash $array
+		 * @return Array 
+		 */
 		public static function keys($array){
-			$result = array();
-			foreach($array as $key => $value) $result[] = $key;
-			return $result;
-		}
-
-		public static function values($array){
-			$values = array();
-			foreach($array as $value) $values[] = $value;
-			return $values;
+			return array_keys($array);
 		}
 
 		/**
-		 * @return mixed $element(or $key)  value of first element of input array (or it's key if $returnKey is true)
-		 * @param array $array
+		 * Get element from hash by index
+		 * @param Array || hash $array
+		 * @param String || Integer $index_name
+		 * @param Any $returning
+		 * @return Any
 		 */
-		public static function first($array, $return_key = false){
-			foreach($array as $key => $element) return ($return_key ?  $key : $array[$key]);
+		public static function get($array, $index, $returning = null) {
+			return (isset($array[$index]) ? $array[$index] : $returning);
+		}
+
+		/**
+		 * Get first element of array or $returning if it empty
+		 * @param Array $array
+		 * @param Any $returning
+		 * @return Any
+		 */
+		public static function first($array, $returning = null){
+			if (empty($array)) return $returning;
+			foreach ($array as $element) return $element;
 		}
 
 		/**
@@ -146,9 +161,10 @@
 		}
 
 		/**
-		 * @return mixed  $value of an element of input array with given index. Also removes this element from input array
-		 * @param array $array
-		 * @param string $index
+		 * Delete element from array
+		 * @param Array $array
+		 * @param Integer || String $index
+		 * @return Any
 		 */
 		public static function delete(&$array, $index){
 			$value = $array[$index];
@@ -166,10 +182,10 @@
 			}
 		}
 
-    public static function compact($array){
-      foreach($array as $key => $element) if(empty($element)) unset($array[$key]);
-      return $array;
-    }
+		public static function compact($array){
+			foreach($array as $key => $element) if(empty($element)) unset($array[$key]);
+			return $array;
+		}
 	}
 
 ?>

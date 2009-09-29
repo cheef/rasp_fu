@@ -1,14 +1,17 @@
 <?php
 
-  rasp_lib(
-    'types.abstract_type', 'types.array',
-    'exception', 'tools.catcher'
-  );
-
 	/**
-	 * Class for working with hashes
+	 * This class provides functionality to work with hashes
 	 * @author Ivan Garmatenko <cheef.che@gmail.com>
+	 * $Id$
 	 */
+
+	rasp_lib(
+		'types.abstract_type', 'types.array',
+		'exception', 'tools.catcher'
+	);
+
+
 	class RaspHash extends RaspAbstractType {
 
 		public static function map($array, $field){
@@ -24,14 +27,33 @@
 		}
 
 		/**
-		 * Getter for hash elements
+		 * Get element from hash by index name
 		 * @param Hash $hash
 		 * @param String || Integer $index_name
 		 * @param Any $returning
 		 * @return Any
 		 */
 		public static function get($hash, $index_name, $returning = null) {
-			return (isset($hash[$index_name]) ? $hash[$index_name] : $returning);
+			return RaspArray::get($hash, $index_name, $returning);
+		}
+
+		/**
+		 * Get hash keys
+		 * @param Hash $hash
+		 * @return Array
+		 */
+		public static function keys($hash) {
+			return RaspArray::keys($hash);
+		}
+
+		/**
+		 * Get first element of hash or $returning if it empty
+		 * @param Hash $hash
+		 * @param Any $returning
+		 * @return Any
+		 */
+		public static function first($hash, $returning = null) {
+			return RaspArray::first($hash, $returning);
 		}
 
 		/**
@@ -41,9 +63,23 @@
 		 * @return Any
 		 */
 		public static function delete(&$hash, $index_name){
-			$value = self::get($hash, $index_name);
-			unset($hash[$index_name]);
-			return $value;
+			return RaspArray::delete($hash, $index_name);
+		}
+
+		/**
+		 * Checks hash element if blank
+		 * 
+		 * Element blank if it:
+		 * NULL
+		 * not exists
+		 *
+		 * @param Hash $hash
+		 * @param String $index_name
+		 * @return Boolean
+		 */
+		public static function is_blank($hash, $index_name){
+			if (!array_key_exists($hash, $index_name) || $hash[$index_name] === null) return true;
+			return false;
 		}
 
 		/**
@@ -57,25 +93,23 @@
 		}
 
 		/**
-		 * Checks element of hash if blank
-		 * @param Hash $hash
-		 * @param String $index_name
-		 * @return Boolean
-		 */
-		public static function is_blank($hash, $index_name){
-			if(!isset($hash[$index_name])) return true;
-			if(empty($hash[$index_name]) && $hash[$index_name] != false && $hash[$index_name] != 0 && $hash[$index_name] != '0') return true;
-			return false;
-		}
-
-		/**
 		 * Check hash element if empty
+		 *
+		 * Element empty if it:
+		 * ""      (an empty string)
+		 * 0       (0 as an integer)
+		 * "0"     (0 as a string)
+		 * NULL
+		 * FALSE
+		 * array() (an empty array)
+		 * not exists
+		 *
 		 * @param Hash $hash
 		 * @param String || Integer $index_name
 		 * @return Boolean
 		 */
-		public function is_empty($hash, $index_name) {
-			if(!isset($hash[$index_name])) return true;
+		public static function is_empty($hash, $index_name) {
+			if (!array_key_exists($index_name, $hash)) return true;
 			return empty($hash[$index_name]);
 		}
 
@@ -85,7 +119,7 @@
 		 * @param String || Integer $index_name
 		 * @return Boolean
 		 */
-		public function is_not_empty($hash, $index_name) {
+		public static function is_not_empty($hash, $index_name) {
 			return !self::is_empty($hash, $index_name);
 		}
 
@@ -113,8 +147,7 @@
 		 * @return Bolean 
 		 */
 		public static function is_true($hash, $index_name){
-			$value = self::get($hash, $index_name);
-			return ($value === true ? true : false);
+			return self::is_not_empty($hash, $index_name) && $hash[$index_name] === true;
 		}
 	}
 ?>
