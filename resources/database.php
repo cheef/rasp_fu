@@ -42,13 +42,12 @@
 		}
 
 		public function query($sql = ""){
-			try {
-				if(!($result = mysql_query($sql, $this->handler))) throw new RaspDatabaseQueryException(array(
-					'sql' => $sql,
-					'error_message' => $this->error_message(),
-					'error_number' => $this->error_number()
-				)); return $result; }
-			catch(RaspDatabaseQueryException $e) { RaspCatcher::add($e); }
+		  try {
+			if(!($result = mysql_query($sql, $this->handler))) throw new RaspException(
+			  'Error occured during query: ' . $sql . "\n" . 'Mysql error[' . $this->error_number() . ']:' . $this->error_message() . "\n"
+			);
+			return $result;
+		  } catch(RaspDatabaseQueryException $e) { RaspCatcher::add($e); }
 		}
 
 		public static function create($options){

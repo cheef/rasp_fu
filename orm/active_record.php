@@ -4,7 +4,7 @@
 	 * This class provides ORM functionality
 	 * @author Ivan Garmatenko <cheef.che@gmail.com>
 	 * @link http://wiki.github.com/cheef/rasp_fu/rasp-orm
-	 * $Id$
+	 * $Id: active_record.php,v 1.2 2009/09/30 11:15:03 igarmatenko Exp $
 	 */
 
 	rasp_lib(
@@ -20,7 +20,7 @@
 	class RaspActiveRecord implements RaspModel {
 
 		protected static $connections = array();
-		protected static $class_name;
+		protected static $class_name = __CLASS__;
 		public static $connection_params = array();
 		public static $table_name, $table_fields = array(), $fields = array();
 		public static $options = array(
@@ -58,7 +58,7 @@
 		}
 
 		public function set($attribute, $value){
-			eval('return $this->' . (self::options('underscored') ? RaspString::underscore($attribute) : $attribute) . ' = \$value;');
+			eval('return $this->' . (self::options('underscored') ? RaspString::underscore($attribute) : $attribute) . ' = $value;');
 		}
 
 		#Find methods
@@ -86,6 +86,18 @@
 			} catch (RaspActiveRecordException $e) { RaspCatcher::add($e); }
 		}
 
+		public static function find_by_sql($sql, $options = array()){
+			try {
+				self::class_name($options);
+
+				if (!self::establish_connection()) throw new RaspActiveRecordException(self::EXCEPTION_NO_CONNECTION_WITH_DB);
+				$returning = array();
+				$reponse_resource = self::$connections[self::class_name()]->query($sql);
+				eval('while($result = self::$connections[self::class_name()]->fetch($reponse_resource)) $returning[] = new ' . self::class_name() . '($result);');
+				return $returning;
+			} catch(RaspActiveRecordException $e){ RaspCatcher::add($e); }
+		}
+
 		/**
 		 * Find record by id
 		 * @param Integer || String $id
@@ -99,7 +111,7 @@
 				self::class_name($options);
 
 				$q = self::find('constructor');
-				$q->select('all')
+				$q->select(RaspHash::get($options, 'fields', 'all'))
 					->from(self::table_name() )
 					->where(self::conditions($options))
 					->where(array('id' => (int) $id))
@@ -134,7 +146,7 @@
 			self::class_name($options);
 
 			$q = self::find('constructor');
-			$q->select('all')
+			$q->select(RaspHash::get($options, 'fields', 'all'))
 				->from(self::table_name())
 				->where(self::conditions($options))
 				->limit(1);
@@ -146,24 +158,13 @@
 			self::class_name($options);
 
 			$q = self::find('constructor');
-			$q->select('all')
+			$q->select(RaspHash::get($options, 'fields', 'all'))
 				->from(self::table_name())
 				->where(self::conditions($options))
 				->order(self::order_by($options))
 				->limit(self::limit($options))
 				->offset(self::offset($options));
 			return self::find_by_sql($q->to_sql());
-		}
-
-		public static function find_by_sql($sql, $options = array()){
-			try {
-				self::class_name($options);
-				if(!self::establish_connection()) throw new RaspActiveRecordException(self::EXCEPTION_NO_CONNECTION_WITH_DB);
-				$returning = array();
-				$reponse_resource = self::$connections[self::class_name()]->query($sql);
-				eval('while($result = self::$connections[self::class_name()]->fetch($reponse_resource)) $returning[] = new ' . self::$class_name . '($result);');
-				return $returning;
-			} catch(RaspActiveRecordException $e){ RaspCatcher::add($e); }
 		}
 
 		protected static function find_by_constructor($options = array()){
@@ -216,9 +217,8 @@
 			return ($saving ? $object->save() : $object);
 		}
 
-		public static function initilize($params, $options = array()){
-			self::class_name($options);
-			eval('$object = new ' . self::class_name() . '($params);');
+		public static function initialize($params, $options = array()){
+			eval('$object = new ' . self::class_name($options) . '($params);');
 			return $object;
 		}
 
@@ -239,21 +239,23 @@
 				$strings_for_update = array();
 				foreach($this->attributes as $attribute => $value)
 					if(in_array($attribute, $this->only_table_attributes())) $strings_for_update[] = self::escape($attribute, '`') . ' = ' . self::escape($value);
-				$saved = self::$connections[self::class_name()]->query('UPDATE ' . self::table_name() . ' SET ' . join(',', $strings_for_update) . ' WHERE `' . self::options('id_field') . '` = ' . $this->attributes(self::options('id_field')));
+				$query = 'UPDATE ' . self::table_name() . ' SET ' . join(',', $strings_for_update) . ' WHERE `' . self::options('id_field') . '` = ' . $this->attributes(self::options('id_field'));
+				$saved = self::$connections[self::class_name()]->query($query);
 				return ($saved ? $this : false);
 			} catch(RaspActiveRecordException $e){ RaspCatcher::add($e); }
 		}
 
 		protected function insert($attributes = array()){
 			try {
-				if(!empty($attributes)) foreach($attributes as $attribute => $value) $this->set($attribute, $value);        
-				if(!self::establish_connection()) throw new RaspActiveRecordException(self::EXCEPTION_NO_CONNECTION_WITH_DB);
+				if (!empty($attributes)) foreach($attributes as $attribute => $value) $this->set($attribute, $value);
+				if (!self::establish_connection()) throw new RaspActiveRecordException(self::EXCEPTION_NO_CONNECTION_WITH_DB);
+
 				$sql = "INSERT INTO " . self::table_name() . "(" . join(',', self::escape($this->only_table_attributes(), '`')) . ") VALUES (" . join(',', self::escape($this->only_table_values())) . ");";
 				return self::$connections[self::class_name()]->query($sql);
 			} catch(RaspActiveRecordException $e){ RaspCatcher::add($e); }
 		}
 
-	public function delete(){
+		public function delete(){
 		return self::$connections[self::class_name()]->query("DELETE FROM " . self::table_name() . " WHERE `" . self::options('id_field') . "` = " . $this->id);
 	}
 
@@ -264,7 +266,7 @@
 
 		#Connection methods
 
-		public static function class_name($options = null){
+		public static function class_name($options = null) {
 			return (empty($options) ? self::$class_name : self::$class_name = RaspHash::get($options, 'class', __CLASS__));
 		}
 
@@ -336,7 +338,7 @@
 
 		public static function table_name(){
 			eval('$table_name = ' . self::class_name() . '::$table_name;');
-			if(empty($table_name)) $table_name = RaspString::tableize(self::$class_name);
+			if (empty($table_name)) $table_name = RaspString::tableize(self::$class_name);
 			return $table_name;
 		}
 

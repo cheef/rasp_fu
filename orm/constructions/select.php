@@ -3,7 +3,7 @@
 	/**
 	 * Class provides construction of sql-request via object
 	 * @author Ivan Garmatenko <cheef.che@gmail.com>
-	 * $Id: select.php,v 1.2 2009/09/24 13:52:19 igarmatenko Exp $
+	 * $Id: select.php,v 1.1 2009/09/29 15:13:58 igarmatenko Exp $
 	 */
 
 	rasp_lib(

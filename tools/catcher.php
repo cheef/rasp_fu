@@ -1,13 +1,20 @@
 <?php
 	class RaspCatcher {
 		public static $exceptions = array();
-		public static $default_options = array('die' => true);
+		public static $default_options = array('action' => 'die');
 
 		public function add($exception, $options = array()){
 			$options = array_merge(self::$default_options, $options);
 			self::$exceptions[] = $exception;
-			if($options['die']) throw $exception;
-			else return false;
+            switch ($options['action']) {
+              case 'die':
+                die($exception->getMessage());
+              case 'nothing':
+                return false;
+              default:
+              case 'delegate':
+                throw $exception;
+            }
 		}
 
 		private static function show(){
