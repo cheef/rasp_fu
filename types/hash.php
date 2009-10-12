@@ -78,7 +78,7 @@
 		 * @return Boolean
 		 */
 		public static function is_blank($hash, $index_name){
-			if (!array_key_exists($hash, $index_name) || $hash[$index_name] === null) return true;
+			if (!array_key_exists($index_name, $hash) || $hash[$index_name] === null) return true;
 			return false;
 		}
 
