@@ -139,6 +139,10 @@
 		private function content(&$options) {
 			if (RaspHash::is_not_empty($options, 'data')) {
 				$content = RaspHash::delete($options, 'data');
+				if (!is_array($content)) {
+					if (!isset($options['headers'])) $options['headers'] = array();
+					$options['headers'] = RaspHash::merge($options['headers'], array('Content-length' => strlen($content)));
+				}
 
 				if (RaspHash::is_not_blank($options, 'post') && $options['post'] === true) {
 					return $this->set(array(CURLOPT_POSTFIELDS => $content));
@@ -159,6 +163,19 @@
 			}
 		}
 
+		/**
+		 * Set required and nessary options
+		 * @param Hash $options
+		 * @return Hash
+		 */
+		private function system(&$options) {
+			return $this->set(array(
+				CURLOPT_RETURNTRANSFER => true,
+				CURLOPT_CONNECTTIMEOUT => RaspHash::delete($options, 'timeout'),
+				CURLOPT_HEADER         => true,
+				CURLOPT_AUTOREFERER    => true
+			));
+		}
 
 		/** Request methods */
 
@@ -167,28 +184,25 @@
 		 * @param Hash $options
 		 */
 		private function configure($options = array()){
-			$request_options = RaspHash::merge(self::$default_requester_options, $options);
-
-			$this->set(array(
-				CURLOPT_RETURNTRANSFER => true,
-				CURLOPT_CONNECTTIMEOUT => RaspHash::delete($request_options, 'timeout'),
-				CURLOPT_HEADER => true,
-				CURLOPT_AUTOREFERER => true
-			));
+			$options = RaspHash::merge(self::$default_requester_options, $options);
+			
+			$this->system($options);
 
 			$this->port($options);
 
 			$this->basic_auth($options);
 
 			$this->follow_redirect($options);
-
-			$this->headers($options);
-
+			
 			$this->content($options);
 
 			$this->post($options);
 
 			$this->cookies($options);
+
+			$this->headers($options);
+
+			return true;
 		}
 
 		/**
