@@ -392,7 +392,7 @@
 
 		public static function close_connection(){
 			$returning = self::connection(self::class_name())->close();
-			if ($returning) self::connection(self::class_name()) = null;
+			if ($returning) self::$connection[self::class_name()] = null;
 			return $returning;
 		}
 
