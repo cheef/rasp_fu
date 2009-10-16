@@ -142,10 +142,10 @@
 		public static function find_by_sql($sql, $options = array()){
 			try {
 
+				$class_name = self::class_name($options);
 				if (!self::establish_connection()) throw new RaspActiveRecordException(self::EXCEPTION_NO_CONNECTION_WITH_DB);
 				if (empty($sql)) throw new RaspActiveRecordException(self::EXCEPTION_NO_SQL_TO_EXECUTE);
-
-				$class_name = self::class_name($options);
+				
 				$returning  = array();
 				$connection = self::connection($class_name);
 				$request    = $connection->query($sql);
@@ -207,6 +207,7 @@
 		 */
 		protected static function find_count($options = array()){
 			try {
+				self::class_name($options);
 				if (!self::establish_connection()) throw new RaspActiveRecordException(self::EXCEPTION_NO_CONNECTION_WITH_DB);
 
 				$connection = self::connection(self::class_name($options));
@@ -217,7 +218,7 @@
 				  ->limit(1);
 				$size = RaspArray::first($connection->fetch($connection->query($q->to_sql())));
 				
-				return empty($size) ? 0 : (int) $size;
+				return (int) $size;
 
 			} catch(RaspActiveRecordException $e) { RaspCatcher::add($e); }
 		}
