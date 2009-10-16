@@ -1,44 +1,91 @@
 <?php
 
-  rasp_lib(
-    'types.abstract_type', 'types.array'
-  );
+	/**
+	 * Iteration
+	 * @author Ivan Garmatenko <cheef.che@gmail.com>
+	 */
 
-	class RaspCollection extends RaspAbstractType {
+	class RaspCollection implements Iterator {
 
-		public $data = null, $first = null, $last = null, $size;
+		/**
+		 * Data storage
+		 * @var Array
+		 */
+		private $data = array();
 
-		public function RaspCollection($array){
-			$this->data = $array;
-			$this->set_first();
-			$this->set_last();
-			$array = null;
+		public function __construct($data = array()) {
+			$this->data = $data;
 		}
 
-		public function size($forcing = false){
-			return (($forcing || empty($this->size)) ? $this->size = count($this->data) : $this->size);
+		/**
+		 * Set the internal pointer of an array data to its first element
+		 */
+		public function rewind() {
+			reset($this->data);
 		}
 
-		public function add($element){
+		/**
+		 * Return the current element in an data array
+		 * @return Any
+		 */
+		public function current() {
+			return current($this->data);
+		}
+
+		/**
+		 * Returns the index element of the current data array position.
+		 * @return Integer
+		 */
+		public function key() {
+			return key($this->data);
+		}
+
+		/**
+		 * Advance the internal array pointer of an array
+		 * @return Any
+		 */
+		public function next() {
+			return next($this->data);
+		}
+
+		/**
+		 * Checks if cursor position is out of array
+		 * @return Boolean
+		 */
+		public function valid() {
+			return $this->current() !== false;
+		}
+
+		/**
+		 * Checks if data array is empty
+		 * @return Boolean
+		 */
+		public function is_empty() {
+			$data = $this->data;
+			return empty($data);
+		}
+
+		public function add($element) {
 			$this->data[] = $element;
-			return $this->set_last();
 		}
 
-		private function set_last(){
-			$local_size = 1;
-			foreach($this->data as $key => $element) {
-				if($local_size == count($this->data)) return $this->last = &$this->data[$key];
-				$local_size++;
-			}
+		public function add_each($elements) {
+			if (!is_array($elements)) throw new Exception('Wrong argument for method, expected Array but was ' . gettype($elements));
+			return $this->data = array_merge($this->data, $elements);
 		}
 
-		private function set_first(){
-			foreach($this->data as $key => $element) return $this->first = &$this->data[$key];
+		public function first() {
+			if ($this->is_empty()) return array();
+			return $this->data[0];
 		}
 
-		public static function create($array){
-			return new RaspCollection($array);
+		public function last() {
+			if ($this->is_empty()) return array();
+			return $this->data[count($this->data) - 1];
+		}
+
+		public static function initialize($data = array()) {
+			return new RaspCollection($data);
 		}
 	}
-
 ?>

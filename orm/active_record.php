@@ -4,14 +4,13 @@
 	 * This class provides ORM functionality
 	 * @author Ivan Garmatenko <cheef.che@gmail.com>
 	 * @link http://wiki.github.com/cheef/rasp_fu/rasp-orm
-	 * $Id: active_record.php,v 1.2 2009/09/30 11:15:03 igarmatenko Exp $
 	 */
 
 	rasp_lib(
 		'types.string', 'types.array', 'types.hash',
 		'resources.database',
 		'exception', 'tools.catcher',
-		'orm.interfaces.model', 'orm.active_field', 'orm.sql_constructor', 'orm.constructions.expression',
+		'orm.interfaces.model', 'orm.active_field', 'orm.sql_constructor', 'orm.constructions.expression', 'orm.active_record_collection',
 		'validation.validator_manager'
 	);
 
@@ -42,6 +41,7 @@
 		const EXCEPTION_MISSED_ID              = "Missed id param";
 		const EXCEPTION_MISSED_DATABASE_PARAMS = "Missed database connection params";
 		const EXCEPTION_NO_CONNECTION_WITH_DB  = "Error, no connection with database";
+		const EXCEPTION_NO_SQL_TO_EXECUTE      = "Error, no sql assigned to execute";
 
 		public function __construct($params = array()){
 			if (!empty($params)) foreach($params as $attribute => $value) $this->set($attribute, $value);
@@ -71,8 +71,9 @@
 		 */
 		public static function find($mode, $options = array()){
 			try {
-				
-				switch($mode){
+
+				/** Casing work modes */
+				switch ($mode){
 					case 'all':         return self::find_all($options);
 					case 'first':       return self::find_first($options);
 					case 'count':       return self::find_count($options);
@@ -83,19 +84,36 @@
 						throw new RaspActiveRecordException(self::EXCEPTION_WRONG_FIND_MODE);
 						break;
 				}
+
 			} catch (RaspActiveRecordException $e) { RaspCatcher::add($e); }
 		}
 
 		public static function find_by_sql($sql, $options = array()){
 			try {
-				self::class_name($options);
 
 				if (!self::establish_connection()) throw new RaspActiveRecordException(self::EXCEPTION_NO_CONNECTION_WITH_DB);
-				$returning = array();
-				$reponse_resource = self::$connections[self::class_name()]->query($sql);
-				eval('while($result = self::$connections[self::class_name()]->fetch($reponse_resource)) $returning[] = new ' . self::class_name() . '($result);');
+				if (empty($sql)) throw new RaspActiveRecordException(self::EXCEPTION_NO_SQL_TO_EXECUTE);
+
+				$class_name = self::class_name($options);
+				$returning  = array();
+				$connection = self::$connections[$class_name];
+				$request    = $connection->query($sql);
+
+				if (!self::need_fetch($options)) {
+					return RaspActiveRecordCollection::initialize(array(
+						'connection'   => $connection,
+						'request'      => $request,
+						'object_class' => $class_name,
+					));
+				}
+
+				while ($result = $connection->fetch($request)) {
+					$returning[] = new $class_name($result);
+				}
+
 				return $returning;
-			} catch(RaspActiveRecordException $e){ RaspCatcher::add($e); }
+
+			} catch (RaspActiveRecordException $e) { RaspCatcher::add($e); }
 		}
 
 		/**
@@ -124,7 +142,7 @@
 		}
 
 		protected static function find_by_ids($ids, $options = array()) {
-			return false;
+			return array();
 		}
 
 		protected static function find_count($options = array()){
@@ -164,7 +182,7 @@
 				->order(self::order_by($options))
 				->limit(self::limit($options))
 				->offset(self::offset($options));
-			return self::find_by_sql($q->to_sql());
+			return self::find_by_sql($q->to_sql(), $options);
 		}
 
 		protected static function find_by_constructor($options = array()){
@@ -217,9 +235,9 @@
 			return ($saving ? $object->save() : $object);
 		}
 
-		public static function initialize($params, $options = array()){
-			eval('$object = new ' . self::class_name($options) . '($params);');
-			return $object;
+		public static function initialize($params = array(), $options = array()){
+			$class_name = self::class_name($options);
+			return new $class_name($params);
 		}
 
 		public function save($attributes = array(), $validate = true){
@@ -260,13 +278,23 @@
 	}
 
 		public function update_all($attributes){
-			foreach($attributes as $attribute => $value) $this->set($attribute, $value);
+			foreach ($attributes as $attribute => $value) $this->set($attribute, $value);
 			return $this->update();
 		}
 
 		#Connection methods
 
-		public static function class_name($options = null) {
+		/**
+		 * Checks if need fetch all found records, by default is true
+		 * @param Hash $options
+		 * @return Boolean
+		 */
+		private static function need_fetch($options) {
+			$need_fetch = RaspHash::get($options, 'fetch', true);
+			return $need_fetch !== false;
+		}
+
+		public static function class_name($options = array()) {
 			return (empty($options) ? self::$class_name : self::$class_name = RaspHash::get($options, 'class', __CLASS__));
 		}
 
