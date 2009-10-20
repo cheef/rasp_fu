@@ -33,7 +33,7 @@
 			)
 		);
 
-		public $attributes;
+		public $attributes = array();
 		protected static $validate = array();
 		protected $errors;
 
@@ -68,7 +68,7 @@
 		 */
 		public function set($attribute_name, $value){
 			$attribute_name = self::options('underscored') ? RaspString::underscore($attribute_name) : $attribute_name;
-			return $this->$attribute_name = $value;
+			return $this->attributes[$attribute_name] = $value;
 		}
 
 		/**
@@ -78,7 +78,7 @@
 		 */
 		public function get($attribute_name) {
 			if (in_array($attribute_name, array_keys($this->attributes))) {
-				return $this->$attributes[$attribute_name];
+				return $this->attributes[$attribute_name];
 			}
 			return null;
 		}
@@ -118,7 +118,7 @@
 		 * Find records from database, constructs query and parse it into objects
 		 * @param String || Integer || Array $mode
 		 * @param Hash $options
-		 * @return Boolean || Object || Array
+		 * @return false || Object || Array
 		 */
 		public static function find($mode, $options = array()){
 			try {
@@ -139,18 +139,22 @@
 			} catch (RaspActiveRecordException $e) { RaspCatcher::add($e); }
 		}
 
+		/**
+		 * Found records by custom sql
+		 * @param String $sql
+		 * @param Hash $options
+		 * @return false || Array
+		 */
 		public static function find_by_sql($sql, $options = array()){
 			try {
 
-				$class_name = self::class_name($options);
-				if (!self::establish_connection()) throw new RaspActiveRecordException(self::EXCEPTION_NO_CONNECTION_WITH_DB);
 				if (empty($sql)) throw new RaspActiveRecordException(self::EXCEPTION_NO_SQL_TO_EXECUTE);
-				
-				$returning  = array();
-				$connection = self::connection($class_name);
+
+				$class_name = self::class_name($options);
+				$connection = self::establish_connection($class_name);
 				$request    = $connection->query($sql);
 
-				if (!self::need_fetch($options)) {
+				if (false === self::need_fetch($options)) {
 					return RaspActiveRecordCollection::initialize(array(
 						'connection'   => $connection,
 						'request'      => $request,
@@ -158,6 +162,7 @@
 					));
 				}
 
+				$returning = array();
 				while ($result = $connection->fetch($request)) {
 					$returning[] = new $class_name($result);
 				}
@@ -207,11 +212,11 @@
 		 */
 		protected static function find_count($options = array()){
 			try {
-				self::class_name($options);
-				if (!self::establish_connection()) throw new RaspActiveRecordException(self::EXCEPTION_NO_CONNECTION_WITH_DB);
 
-				$connection = self::connection(self::class_name($options));
-				$q = self::find('constructor');
+				$class_name = self::class_name($options);
+				$connection = self::establish_connection($class_name);
+				$q          = self::find('constructor');
+
 				$q->select('COUNT(*)')
 				  ->from(self::table_name($options))
 				  ->where(self::conditions($options))
@@ -251,6 +256,8 @@
 				->from(self::table_name($options))
 				->where(self::conditions($options))
 				->order(self::order_by($options))
+				->group(self::group($options))
+				->having(self::having($options))
 				->limit(self::limit($options))
 				->offset(self::offset($options));
 			return self::find_by_sql($q->to_sql(), $options);
@@ -304,6 +311,14 @@
 		protected static function offset($options = array()){
 			return (!empty($options) && ($offset = RaspHash::get($options, 'offset', false)) ? $offset : null);
 		}
+		
+		protected static function having($options = array()){
+			return (!empty($options) && ($having = RaspHash::get($options, 'having', false)) ? $having : null);
+		}
+
+		protected static function group($options = array()){
+			return (!empty($options) && ($group = RaspHash::get($options, 'group', false)) ? $group : null);
+		}
 
 		#CRUD
 
@@ -320,32 +335,36 @@
 		}
 
 		public function save($attributes = array(), $validate = true){
-			if(!empty($attributes)) foreach($attributes as $attribute => $value) $this->set($attribute, $value);
+			if (!empty($attributes)) $this->attributes($attributes);
 
-			if($validate){
-				if($this->is_valid()) return ($this->is_new_record() ? $this->insert() : $this->update());
+			if ($validate){
+				if ($this->is_valid()) return ($this->is_new_record() ? $this->insert() : $this->update());
 				else return false;
 			}
 			else return ($this->is_new_record() ? $this->insert() : $this->update());
 		}
 
-		protected function update($attributes = array()){
+		/**
+		 * Update all attributes
+		 * @TODO check each attribute change or not
+		 * @param Hash $attributes
+		 * @param Hash $options
+		 * @return Object || false
+		 */
+		public function update($attributes = array(), $options = array()){
 			try {
 				if (!self::establish_connection()) throw new RaspActiveRecordException(self::EXCEPTION_NO_CONNECTION_WITH_DB);
 				if (!empty($attributes)) $this->attributes($attributes);
-				
-				$strings_for_update = array();
-				foreach($this->attributes() as $attribute => $value) {
-					if (in_array($attribute, $this->only_table_attributes())) {
-						$strings_for_update[] = self::escape($attribute, '`') . ' = ' . self::escape($value);
-					}
-				}
-				$query = 'UPDATE ' . self::table_name() . ' SET ' . join(',', $strings_for_update) . ' WHERE `' . self::options('id_field') . '` = ' . $this->attribute(self::options('id_field'));
-				$saved = self::$connections[self::class_name()]->query($query);
-				return ($saved ? $this : false);
+
+				return $this->update_attributes($this->attributes(), $options);
 			} catch (RaspActiveRecordException $e) { RaspCatcher::add($e); }
 		}
 
+		/**
+		 * Insert into db new record
+		 * @param Hash $attributes
+		 * @return Object || false
+		 */
 		protected function insert($attributes = array()){
 			try {
 				if (!self::establish_connection()) throw new RaspActiveRecordException(self::EXCEPTION_NO_CONNECTION_WITH_DB);
@@ -356,13 +375,45 @@
 			} catch (RaspActiveRecordException $e) { RaspCatcher::add($e); }
 		}
 
-		public function delete() {
-			$sql = "DELETE FROM " . self::table_name() . " WHERE `" . self::options('id_field') . "` = " . $this->id;
-			return self::$connections[self::class_name()]->query($sql);
+		public function delete($options = array()) {
+			$sql = "DELETE FROM " . self::table_name($options) . " WHERE `" . self::options('id_field') . "` = " . $this->attributes('id');
+			return self::$connections[self::class_name($options)]->query($sql);
 		}
 
-		public function update_all($attributes){			
-			return $this->update($attributes);
+		/**
+		 * Update only assigned attributes
+		 * @TODO construct sql via object constructor as select
+		 * @param Hash $attributes
+		 * @param Hash $options
+		 * @return Object || false
+		 */
+		public function update_attributes($attributes, $options = array()) {
+			try {
+				if (!self::establish_connection()) throw new RaspActiveRecordException(self::EXCEPTION_NO_CONNECTION_WITH_DB);
+
+				$strings_for_update = array();
+				foreach($attributes as $attribute => $value) {
+					if (in_array($attribute, $this->only_table_attributes())) {
+						$strings_for_update[] = self::escape($attribute, '`') . ' = ' . self::escape($value);
+					}
+				}
+				$query = 'UPDATE ' . self::table_name($options) . ' SET ' . join(',', $strings_for_update) . ' WHERE `' . self::options('id_field') . '` = ' . $this->attribute(self::options('id_field'));
+				$saved = self::$connections[self::class_name($options)]->query($query);
+				return ($saved ? $this : false);
+			} catch (RaspActiveRecordException $e) { RaspCatcher::add($e); }
+		}
+
+		/**
+		 * Delete all records by ids
+		 * @TODO  construct sql via object constructor as select
+		 * @param Array $ids
+		 * @param Hash $options
+		 * @return Boolean
+		 */
+		public static function delete_all($ids, $options = array()) {
+			$connection = self::$connections[self::class_name($options)];
+			$sql = "DELETE FROM " . self::table_name($options) . " WHERE `" . self::options('id_field') . "` IN (" . join(',', $ids) . ")";
+			return $connection->query($sql);
 		}
 
 		#Connection methods
@@ -381,20 +432,45 @@
 			return (empty($options) ? self::$class_name : self::$class_name = RaspHash::get($options, 'class', __CLASS__));
 		}
 
-		public static function establish_connection($forcing = false){
+		/**
+		 * Establish connection
+		 * @param String $connection_name
+		 * @param Boolean $forcing
+		 * @return Object
+		 */
+		public static function establish_connection($connection_name = null, $forcing = false){
 			try {
-				eval('$connection_params = ' . self::class_name() .'::$connection_params;');
-				if(empty($connection_params)) $connection_params = self::$connection_params;
-				if(empty($connection_params)) throw new RaspActiveRecordException(self::EXCEPTION_MISSED_DATABASE_PARAMS);
-				$connection = (self::is_connection_established() && !$forcing ? self::$connections[self::class_name()] : self::$connections[self::class_name()] = new self::$options['database']['driver']($connection_params));
-				return $connection;
-			} catch(RaspActiveRecordException $e) { RaspCatcher::add($e); }
+				if (empty($connection_name)) $connection_name = self::class_name();
+
+				if (false === self::is_connection_established($connection_name) || $forcing) {
+					# Try get connection params from child class, then from RaspActiveRecord class
+					eval('$connection_params = ' . $connection_name .'::$connection_params;');
+					if (empty($connection_params)) $connection_params = self::$connection_params;
+					if (empty($connection_params)) throw new RaspActiveRecordException(self::EXCEPTION_MISSED_DATABASE_PARAMS);
+
+					# Establish connection
+					return self::$connections[$connection_name] = new self::$options['database']['driver']($connection_params);
+				}			
+
+				return self::connection($connection_name);
+
+			} catch (RaspActiveRecordException $e) { RaspCatcher::add($e); }
 		}
 
-		public static function close_connection(){
-			$returning = self::connection(self::class_name())->close();
-			if ($returning) self::$connection[self::class_name()] = null;
-			return $returning;
+		/**
+		 * Close connection, if connection name is not assigned used current connection name
+		 * @param String $connection_name
+		 * @return Boolean
+		 */
+		public static function close_connection($connection_name = null){
+			$connection = self::connection(empty($connection_name) ? self::class_name() : $connection_name);
+
+			if (!empty($connection) && $connection->close()) {
+				self::$connection[self::class_name()] = null;
+				return true;
+			}
+
+			return false;
 		}
 
 		public static function close_all_connections(){
@@ -403,13 +479,23 @@
 			return true;
 		}
 
-		public static function is_connection_established(){
-			$connection = RaspHash::get(self::$connections, self::class_name(), null);
+		/**
+		 * Check if connection established, if connection name is not assigned used current connection name
+		 * @param String $connection_name
+		 * @return Boolean
+		 */
+		public static function is_connection_established($connection_name = null){
+			$connection = self::connection(empty($connection_name) ? self::class_name() : $connection_name);
 			return !empty($connection);
 		}
 
+		/**
+		 * Get database connection object by class name
+		 * @param String $class_name
+		 * @return Object || null
+		 */
 		public static function connection($class_name){
-			return self::$connections[$class_name];
+			return RaspHash::get(self::$connections, $class_name, null);
 		}
 
 		#Validation
@@ -441,12 +527,21 @@
 		#Other methods
 
 		/**
-		 * Get table name for current request
+		 * Get table name
 		 * @return String
 		 */
 		public static function table_name($options = array()){
+			
+			# Get from local options
+			$table_name = RaspHash::get($options, 'table');
 			$class_name = self::class_name($options);
-			eval('$table_name = ' . $class_name . '::$table_name;');
+
+			# Try get from child class property
+			if (empty($table_name)) {
+				eval("\$table_name = $class_name::\$table_name;");
+			}
+
+			# Get from class name
 			return empty($table_name) ? RaspString::tableize($class_name) : $table_name;
 		}
 
@@ -458,8 +553,8 @@
 
 		public static function table_fields(){
 			try {
-				if(RaspArray::is_empty(self::$table_fields, self::class_name())){
-					if(!self::establish_connection()) throw new RaspActiveRecordException(self::EXCEPTION_NO_CONNECTION_WITH_DB);
+				if (RaspArray::is_empty(self::$table_fields, self::class_name())){
+					if (!self::establish_connection()) throw new RaspActiveRecordException(self::EXCEPTION_NO_CONNECTION_WITH_DB);
 					$reponse_resource = self::$connections[self::class_name()]->query('SHOW COLUMNS FROM ' . self::table_name());
 					while($result = self::$connections[self::class_name()]->fetch($reponse_resource)) {
 						$result = array_merge($result, array('underscored' => self::options('underscored')));

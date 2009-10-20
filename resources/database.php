@@ -1,53 +1,67 @@
 <?php
 
-  rasp_lib(
-    'types.array',
-    'resources.abstract_resource',
-    'exception', 'tools.catcher'
-  );
-
-	class RaspDatabaseConnectionException extends RaspException { public $message = "There is connection problem, check settings"; }
-	class RaspDatabaseQueryException extends RaspException {
-
-		public $message = "There is error during query";
-
-		public function __construct($options = array()){
-			if(RaspArray::index($options, 'sql', false)) $this->query = $options['sql'];
-			if(RaspArray::index($options, 'error_message', false)) $this->error_message = $options['error_message'];
-			if(RaspArray::index($options, 'error_number', false)) $this->error_number = $options['error_number'];
-			$this->has_additional = true;
-		}
-	}
+	rasp_lib(
+		'types.array',
+		'resources.abstract_resource',
+		'exception', 'tools.catcher'
+	);
 
 	class RaspDatabase extends RaspAbstractResource {
 
-		public static $current;
-		protected $handler, $options, $errors = array();
+		public $handler;
+		protected $options, $errors = array();
 		protected static $default_options = array('host' => 'localhost', 'charset' => 'utf8', 'password' => '');
+		public static $current;
+
+		const EXCEPTION_CONNECTION_ERROR = "There is connection problem, check settings";
 
 		public function __construct($options) {
-			$this->options = array_merge(self::$default_options, $options);
-			$returning = $this->connect($this->options['host'], $this->options['user'], $this->options['password']);
-			if(RaspArray::index($this->options, 'database', false)) $this->select_db($this->options['database']);
-			return $returning;
+			$this->options = RaspHash::merge(self::$default_options, $options);
+
+			$this->connect($this->options['host'], $this->options['user'], $this->options['password']);
+
+			if (RaspArray::index($this->options, 'database', false)) $this->select_db($this->options['database']);
 		}
 
+		/**
+		 * Connect to database
+		 * @param String $host
+		 * @param String $user
+		 * @param String $pass
+		 * @return Resource || false
+		 */
 		protected function connect($host, $user, $pass){
-			try {	if(!($this->handler = mysql_connect($host, $user, $pass))) throw new RaspDatabaseConnectionException; return $this->handler;}
-			catch(RaspDatabaseConnectionException $e){ RaspCatcher::add($e); }
+			try {	
+				if (false === ($this->handler = mysql_connect($host, $user, $pass)))
+					throw new RaspException(self::EXCEPTION_CONNECTION_ERROR);
+
+				return $this->handler;
+			} catch (RaspException $e) { RaspCatcher::add($e); }
 		}
 
 		protected function select_db($name){
 			return mysql_select_db($name, $this->handler);
 		}
 
-		public function query($sql = ""){
-		  try {
-			if(!($result = mysql_query($sql, $this->handler))) throw new RaspException(
-			  'Error occured during query: ' . $sql . "\n" . 'Mysql error[' . $this->error_number() . ']:' . $this->error_message() . "\n"
-			);
-			return $result;
-		  } catch(RaspDatabaseQueryException $e) { RaspCatcher::add($e); }
+		/**
+		 * Send query to database
+		 * @param String $sql
+		 * @return Resource || false
+		 */
+		public function query($sql){
+			
+			if (defined('RASP_DEBUG_LEVEL') && RASP_DEBUG_LEVEL === 'all') {
+				$file = RaspFile::create(array('source' => 'development.log', 'mode' => 'a+'));
+				$file->write($sql . "\n");
+				$file->close();
+			}
+
+			try {
+				if (false === ($result = mysql_query($sql, $this->handler))) 
+					throw new RaspException('Error occured during query: ' . $sql . "\n" . 'Mysql error[' . $this->error_number() . ']:' . $this->error_message() . "\n");
+
+				return $result;
+			} catch (RaspException $e) { RaspCatcher::add($e); }
 		}
 
 		public static function create($options){

@@ -6,9 +6,11 @@
 	 * $Id$
 	 */
 	
-	rasp_lib('types.abstract_type');
+	rasp_lib('types.abstract_type', 'exception', 'tools.catcher');
 
 	class RaspArray extends RaspAbstractType {
+
+		const EXCEPTION_NOT_ARRAY = "Error, this operation applyed only to arrays";
 
 		/**
 		 * Get array keys
@@ -16,6 +18,7 @@
 		 * @return Array 
 		 */
 		public static function keys($array){
+			if (!is_array($array)) throw new RaspException(self::EXCEPTION_NOT_ARRAY);
 			return array_keys($array);
 		}
 

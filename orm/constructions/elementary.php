@@ -72,7 +72,7 @@
 
         return RaspArray::second($matches);
       } catch(RaspElementaryException $e) { RaspCatcher::add($e); };
-    }
+		}
   }
 
 ?>

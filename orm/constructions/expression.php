@@ -12,12 +12,12 @@
 		private static $types = array('logic');
 
 		public function eq($value){
-			$this->value = is_null($value) ? ' IS NULL' : ' = ' . RaspElementary::$values_closer . $value . RaspElementary::$values_closer;
+			$this->value = is_null($value) ? ' IS NULL' : ' = ' . self::escaped_value($value);
 			return $this;
 		}
 
 		public function neq($value){
-			$this->value = is_null($value) ? ' IS NOT NULL' : ' <> ' . RaspElementary::$values_closer . $value . RaspElementary::$values_closer;
+			$this->value = is_null($value) ? ' IS NOT NULL' : ' <> ' . self::escaped_value($value);
 			return $this;
 		}
 
@@ -28,6 +28,27 @@
 
 		public function andw($sql_array){
 			$this->value = join(' AND ', $this->w($sql_array));
+			return $this;
+		}
+
+		public function greater($value) {
+			return $this->comparison($value, '>');
+		}
+
+		public function greatereq($value) {
+			return $this->comparison($value, ">=");
+		}
+
+		public function lower($value) {
+			return $this->comparison($value, "<");
+		}
+
+		public function lowereq($value) {
+			return $this->comparison($value, "<=");
+		}
+
+		private function comparison($value, $sign) {
+			$this->value = " $sign " . self::escaped_value($value);
 			return $this;
 		}
 
@@ -59,6 +80,18 @@
 
 		public static function create(){
 			return new RaspWhereExpression;
+		}
+
+		public static function escaped_value($value) {
+			$value_type = gettype($value);
+
+			switch($value_type) {
+				case 'integer':
+					return $value;
+				case 'string':
+				default:
+					return RaspElementary::$values_closer . addslashes($value) . RaspElementary::$values_closer;
+			}
 		}
 	}
 

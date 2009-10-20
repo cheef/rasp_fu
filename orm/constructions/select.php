@@ -23,7 +23,7 @@
 		const EXCEPTION_WRONG_LIMIT_TYPE    = 'Wrong limit type, expected integer';
 		const EXCEPTION_WRONG_OFFSET_TYPE   = 'Wrong offset type, expected integer';
 
-		protected $elements = array('select', 'from', 'where', 'order', 'limit', 'offset');
+		protected $elements = array('select', 'from', 'where', 'order', 'group', 'having', 'limit', 'offset');
 
 		/**
 		 * Object Constructor
@@ -33,6 +33,8 @@
 			$this->from   = RaspElementary::create()->construction('FROM [tables]');
 			$this->where  = RaspElementary::create()->construction('WHERE [conditions]', 'logic');
 			$this->order  = RaspElementary::create()->construction('ORDER BY [fields]');
+			$this->group  = RaspElementary::create()->construction('GROUP BY [fields]');
+			$this->having = RaspElementary::create()->construction('HAVING [conditions]');
 			$this->limit  = RaspElementary::create()->construction('LIMIT [limit]');
 			$this->offset = RaspElementary::create()->construction('OFFSET [offset]');
 		}
@@ -113,7 +115,46 @@
 		/**
 		 * Set sql-group part
 		 */
-		public function group(){
+		public function group($grouping) {
+			if (empty($grouping)) return $this;
+
+			try {
+
+				$option_type = gettype($grouping);
+				switch ($option_type) {
+					case 'string':
+						$this->group->set($grouping);
+						break;
+					case 'array':
+						$fields_escaped = array();
+						foreach($grouping as $field_name)
+							$fields_escaped[] = RaspElementary::$attributes_closer . $field_name . RaspElementary::$attributes_closer;
+
+						$this->group->set(join(',', $fields_escaped));
+						break;
+					default:
+						throw new RaspSelectException(self::EXCEPTION_WRONG_ORDER_PARAMS);
+				}
+
+			} catch (RaspSelectException $e) { RaspCatcher::add($e); }
+
+			return $this;
+		}
+
+		/**
+		 * Set sql-having part
+		 */
+		public function having($having) {
+			if (empty($having)) return $this;
+
+			try {
+				if (is_string($having))    $this->having->set($having);
+				elseif (is_array($having)) $this->having->set(self::q()->andw($having)->sql());
+				elseif (RaspWhereExpression::is_expr($having))  $this->having->set($having->sql());
+				else throw new RaspSelectException(self::EXCEPTION_WRONG_WHERE_PARAMS);
+				return $this;
+			} catch (RaspSelectException $e) { RaspCatcher::add($e); }
+			return $this;
 		}
 
 		/**
