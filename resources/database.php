@@ -64,6 +64,14 @@
 			} catch (RaspException $e) { RaspCatcher::add($e); }
 		}
 
+		/**
+		 * Return last insert id
+		 * @return String
+		 */
+		public function last_insert_id() {
+			return mysql_insert_id($this->handler);
+		}
+
 		public static function create($options){
 			return self::$current = new RaspDatabase($options);
 		}
