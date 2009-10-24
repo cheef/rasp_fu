@@ -62,9 +62,9 @@
 		const EXCEPTION_CONNECTION_NOT_EXISTS  = "Error, database connection not exists";
 		const EXCEPTION_WRONG_ARGUMENT         = "Error, wrong argument assigned";
 
-		public function __construct($params = array()){
-			if (!empty($params)) {
-				foreach($params as $attribute_name => $value) $this->set($attribute_name, $value);
+		public function __construct($attributes = array()){
+			if (!empty($attributes)) {
+				foreach($attributes as $attribute_name => $value) $this->set($attribute_name, $value);
 			}
 		}
 
@@ -203,11 +203,11 @@
 				$q = self::find('constructor');
 				$q->select(RaspHash::get($options, 'fields', 'all'))
 				  ->from(self::table_name($options))
-				  ->where(self::conditions($options))
+				  ->where(self::local_options('conditions', $options))
 				  ->where(array(self::options('id_field') => (int) $id))
-				  ->order(self::order_by($options))
-				  ->limit(self::limit($options))
-				  ->offset(self::offset($options));
+				  ->order(self::local_options('order', $options))
+				  ->limit(self::local_options('limit', $options))
+				  ->offset(self::local_options('offset', $options));
 
 				return RaspHash::first(self::find_by_sql($q->to_sql(), $options));
 			} catch (RaspActiveRecordException $e) { RaspCatcher::add($e); }
@@ -238,10 +238,10 @@
 
 				$q->select('COUNT(*)')
 				  ->from(self::table_name($options))
-				  ->where(self::conditions($options))
-				  ->order(self::order_by($options))
-				  ->group(self::group($options))
-				  ->having(self::having($options))
+				  ->where(self::local_options('conditions', $options))
+				  ->order(self::local_options('order', $options))
+				  ->group(self::local_options('group', $options))
+				  ->having(self::local_options('having', $options))
 				  ->limit(1);
 				$size = RaspArray::first($connection->fetch($connection->query($q->to_sql())));
 				
@@ -260,10 +260,10 @@
 			$q = self::find('constructor');
 			$q->select(RaspHash::get($options, 'fields', 'all'))
 			  ->from(self::table_name($options))
-			  ->where(self::conditions($options))
-			  ->order(self::order_by($options))
-			  ->group(self::group($options))
-			  ->having(self::having($options))
+			  ->where(self::local_options('conditions', $options))
+			  ->order(self::local_options('order', $options))
+			  ->group(self::local_options('group', $options))
+			  ->having(self::local_options('having', $options))
 			  ->limit(1);
 
 			return RaspHash::first(self::find_by_sql($q->to_sql(), $options));
@@ -279,12 +279,12 @@
 			$q = self::find('constructor');
 			$q->select(RaspHash::get($options, 'fields', 'all'))
 			  ->from(self::table_name($options))
-			  ->where(self::conditions($options))
-			  ->order(self::order_by($options))
-			  ->group(self::group($options))
-			  ->having(self::having($options))
-			  ->limit(self::limit($options))
-			  ->offset(self::offset($options));
+			  ->where(self::local_options('conditions', $options))
+			  ->order(self::local_options('order', $options))
+			  ->group(self::local_options('group', $options))
+			  ->having(self::local_options('having', $options))
+			  ->limit(self::local_options('limit', $options))
+			  ->offset(self::local_options('offset', $options));
 			return self::find_by_sql($q->to_sql(), $options);
 		}
 
@@ -318,6 +318,17 @@
 
 		public static function q(){
 			return RaspWhereExpression::create();
+		}
+
+		/**
+		 * Get local sub options
+		 * @param String $option_name
+		 * @param Hash $all_options
+		 * @return null || options
+		 */
+		protected static function local_options($option_name, $all_options) {
+			$options = RaspHash::get($all_options, $option_name, false);
+			return (empty($options) ? null : $options);
 		}
 
 		protected static function conditions($options = array()){
@@ -397,6 +408,8 @@
 
 		/**
 		 * Insert into db new record
+		 * @TODO construct sql via object constructor as select
+		 * @TODO makes disable show columns request by forcing option
 		 * @param Hash $attributes
 		 * @return Object || false
 		 */
@@ -408,7 +421,11 @@
 
 				$this->attributes($attributes);
 
-				$sql = "INSERT INTO " . self::table_name($options) . "(" . join(',', self::escape($this->only_table_attributes(), '`')) . ") VALUES (" . join(',', self::escape($this->only_table_values())) . ");";
+				if (RaspHash::get($options, 'forcing', false) === false) {
+					$sql = "INSERT INTO " . self::table_name($options) . "(" . join(',', self::escape($this->only_table_attributes(), '`')) . ") VALUES (" . join(',', self::escape($this->only_table_values())) . ");";
+				} else {
+					return false;
+				}
 
 				if (false === $connection->query($sql)) return false;
 				$this->attribute(self::options('id_field'), $connection->last_insert_id());
@@ -434,6 +451,7 @@
 		/**
 		 * Update only assigned attributes
 		 * @TODO construct sql via object constructor as select
+		 * @TODO makes disable show columns request by forcing option
 		 * @param Hash $attributes
 		 * @param Hash $options
 		 * @return Object || false
