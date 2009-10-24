@@ -186,7 +186,7 @@
 				$q->select(RaspHash::get($options, 'fields', 'all'))
 				  ->from(self::table_name($options))
 				  ->where(self::conditions($options))
-				  ->where(array('id' => (int) $id))
+				  ->where(array(self::options('id_field') => (int) $id))
 				  ->order(self::order_by($options))
 				  ->limit(self::limit($options))
 				  ->offset(self::offset($options));
@@ -330,7 +330,7 @@
 		 */
 		public static function create($params, $options = array()){
 			$object = call_user_func(array(self::class_name($options), 'initialize'), $params, $options);
-			return $object->insert() ? $object : false;
+			return $object->insert($params, $options) ? $object : false;
 		}
 
 		public static function initialize($params = array(), $options = array()){
@@ -382,8 +382,9 @@
 		}
 
 		public function delete($options = array()) {
+			$connection = self::establish_connection(self::class_name($options));
 			$sql = "DELETE FROM " . self::table_name($options) . " WHERE `" . self::options('id_field') . "` = " . $this->attributes('id');
-			return self::$connections[self::class_name($options)]->query($sql);
+			return $connection->query($sql);
 		}
 
 		/**
@@ -417,7 +418,7 @@
 		 * @return Boolean
 		 */
 		public static function delete_all($ids, $options = array()) {
-			$connection = self::$connections[self::class_name($options)];
+			$connection = self::establish_connection(self::class_name($options));
 			$sql = "DELETE FROM " . self::table_name($options) . " WHERE `" . self::options('id_field') . "` IN (" . join(',', $ids) . ")";
 			return $connection->query($sql);
 		}

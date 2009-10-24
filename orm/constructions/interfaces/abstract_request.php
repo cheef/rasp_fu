@@ -8,15 +8,15 @@
 		protected $elements = array();
 
 		public static function q(){
-      return RaspWhereExpression::create();
-    }
+			return RaspWhereExpression::create();
+		}
 
-    public function to_sql(){
-      $sql = array();
-      foreach($this->elements as $element) $sql[] = $this->$element->make()->sql();
-      return join(' ', RaspArray::compact($sql));
-    }
+		public function to_sql(){
+			$sql = array();
+			foreach($this->elements as $element) $sql[] = $this->$element->make()->sql();
+			return join(' ', RaspArray::compact($sql));
+		}
 
-    abstract public static function create();
+		abstract public static function create();
 	}
 ?>
