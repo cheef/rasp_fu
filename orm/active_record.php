@@ -60,6 +60,7 @@
 		const EXCEPTION_NO_SQL_TO_EXECUTE      = "Error, no sql assigned to execute";
 		const EXCEPTION_NOT_ENOUGH_ARGUMENTS   = "Error, not enough arguments for method";
 		const EXCEPTION_CONNECTION_NOT_EXISTS  = "Error, database connection not exists";
+		const EXCEPTION_WRONG_ARGUMENT         = "Error, wrong argument assigned";
 
 		public function __construct($params = array()){
 			if (!empty($params)) {
@@ -356,15 +357,27 @@
 			return $object->insert($params, $options) ? $object : false;
 		}
 
+		/**
+		 * Initialize object, static constructor
+		 * @param Hash $params
+		 * @param Hash $options
+		 * @return Object
+		 */
 		public static function initialize($params = array(), $options = array()){
 			$class_name = self::class_name($options);
 			return new $class_name($params);
 		}
 
+		/**
+		 * Save object, if it new - create new record, else update it
+		 * @param Hash $attributes
+		 * @param Boolean $validate
+		 * @return Object || false
+		 */
 		public function save($attributes = array(), $validate = true){
 			if (!empty($attributes)) $this->attributes($attributes);
 
-			if ($validate){
+			if ($validate) {
 				if ($this->is_valid()) return ($this->is_new_record() ? $this->insert() : $this->update());
 				else return false;
 			}
@@ -373,7 +386,7 @@
 
 		/**
 		 * Update all attributes
-		 * @TODO check each attribute change or not
+		 * @TODO check each attribute if change or not
 		 * @param Hash $attributes
 		 * @param Hash $options
 		 * @return Object || false
@@ -391,7 +404,7 @@
 			try {
 
 				$class_name = RaspHash::get($options, 'class', get_class($this));
-				$connection = self::establish_connection($class_name);
+				$connection = self::establish_connection_by_options_or_class_name($class_name);
 
 				$this->attributes($attributes);
 
@@ -404,8 +417,16 @@
 			} catch (RaspActiveRecordException $e) { RaspCatcher::add($e); }
 		}
 
+		/**
+		 * Remove record from database
+		 * @param Hash $options
+		 * @return Boolean
+		 */
 		public function delete($options = array()) {
-			$connection = self::establish_connection(self::class_name($options));
+
+			$class_name = RaspHash::get($options, 'class', get_class($this));
+			$connection = self::establish_connection_by_options_or_class_name($class_name);
+
 			$sql = "DELETE FROM " . self::table_name($options) . " WHERE `" . self::options('id_field') . "` = " . $this->attributes('id');
 			return $connection->query($sql);
 		}
@@ -419,8 +440,9 @@
 		 */
 		public function update_attributes($attributes, $options = array()) {
 			try {
+
 				$class_name = RaspHash::get($options, 'class', get_class($this));
-				$connection = self::establish_connection($class_name);
+				$connection = self::establish_connection_by_options_or_class_name($class_name);
 
 				$strings_for_update = array();
 				foreach($attributes as $attribute => $value) {
@@ -441,7 +463,10 @@
 		 * @return Boolean
 		 */
 		public static function delete_all($ids, $options = array()) {
-			$connection = self::establish_connection(self::class_name($options));
+			if (!is_array($ids)) throw new RaspActiveRecordException(self::EXCEPTION_WRONG_ARGUMENT);
+
+			$class_name = self::class_name($options);
+			$connection = self::establish_connection_by_options_or_class_name($class_name);
 			$sql = "DELETE FROM " . self::table_name($options) . " WHERE `" . self::options('id_field') . "` IN (" . join(',', $ids) . ")";
 			return $connection->query($sql);
 		}
@@ -495,11 +520,11 @@
 
 		/**
 		 * Establish connection by params if local options
-		 * @param Hash $options
+		 * @param Hash $options_or_class
 		 * @return Object || false
 		 */
-		protected static function establish_connection_by_options_or_class_name($options) {
-			$class_name = self::class_name($options);
+		protected static function establish_connection_by_options_or_class_name($options_or_class) {
+			$class_name = self::class_name($options_or_class);
 
 			# If no connection assigned to instance try to open new
 			if (!isset(self::$instances[$class_name]['connection_name'])) {
