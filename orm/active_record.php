@@ -18,20 +18,36 @@
 
 	class RaspActiveRecord implements RaspModel {
 
-		protected static $connections = array();
-		protected static $class_name;
+		/**
+		 * Instances of RaspActiveRecord
+		 * @var Array
+		 */
+		private static $instances = array();
+
+		/**
+		 * Database connections
+		 * @var Array
+		 */
+		private static $connections = array();
+
 		public static $connection_params = array();
 		public static $table_name, $table_fields = array(), $fields = array();
 		public static $options = array(
 			'underscored' => true,
-			'id_field' => 'id',
-			'database' => array(
-				'driver' => 'RaspDatabase'
+			'id_field'    => 'id',
+			'database'    => array(
+				'driver' => 'RaspDatabase',
 			),
-			'pagination' => array(
-				'per_page' => 10
+			'pagination'  => array(
+				'per_page'  => 10,
 			)
 		);
+
+		/**
+		 * Connection name for current object, can be changed
+		 * @var String
+		 */
+		protected static $connection_name = null;
 
 		public $attributes = array();
 		protected static $validate = array();
@@ -43,6 +59,7 @@
 		const EXCEPTION_NO_CONNECTION_WITH_DB  = "Error, no connection with database";
 		const EXCEPTION_NO_SQL_TO_EXECUTE      = "Error, no sql assigned to execute";
 		const EXCEPTION_NOT_ENOUGH_ARGUMENTS   = "Error, not enough arguments for method";
+		const EXCEPTION_CONNECTION_NOT_EXISTS  = "Error, database connection not exists";
 
 		public function __construct($params = array()){
 			if (!empty($params)) {
@@ -151,7 +168,7 @@
 				if (empty($sql)) throw new RaspActiveRecordException(self::EXCEPTION_NO_SQL_TO_EXECUTE);
 
 				$class_name = self::class_name($options);
-				$connection = self::establish_connection($class_name);
+				$connection = self::establish_connection_by_options_or_class_name($class_name);
 				$request    = $connection->query($sql);
 
 				if (false === self::need_fetch($options)) {
@@ -211,15 +228,19 @@
 		 * @return Integer
 		 */
 		protected static function find_count($options = array()){
+
 			try {
 
 				$class_name = self::class_name($options);
-				$connection = self::establish_connection($class_name);
+				$connection = self::establish_connection_by_options_or_class_name($class_name);
 				$q          = self::find('constructor');
 
 				$q->select('COUNT(*)')
 				  ->from(self::table_name($options))
 				  ->where(self::conditions($options))
+				  ->order(self::order_by($options))
+				  ->group(self::group($options))
+				  ->having(self::having($options))
 				  ->limit(1);
 				$size = RaspArray::first($connection->fetch($connection->query($q->to_sql())));
 				
@@ -237,9 +258,12 @@
 
 			$q = self::find('constructor');
 			$q->select(RaspHash::get($options, 'fields', 'all'))
-				->from(self::table_name($options))
-				->where(self::conditions($options))
-				->limit(1);
+			  ->from(self::table_name($options))
+			  ->where(self::conditions($options))
+			  ->order(self::order_by($options))
+			  ->group(self::group($options))
+			  ->having(self::having($options))
+			  ->limit(1);
 
 			return RaspHash::first(self::find_by_sql($q->to_sql(), $options));
 		}
@@ -253,13 +277,13 @@
 
 			$q = self::find('constructor');
 			$q->select(RaspHash::get($options, 'fields', 'all'))
-				->from(self::table_name($options))
-				->where(self::conditions($options))
-				->order(self::order_by($options))
-				->group(self::group($options))
-				->having(self::having($options))
-				->limit(self::limit($options))
-				->offset(self::offset($options));
+			  ->from(self::table_name($options))
+			  ->where(self::conditions($options))
+			  ->order(self::order_by($options))
+			  ->group(self::group($options))
+			  ->having(self::having($options))
+			  ->limit(self::limit($options))
+			  ->offset(self::offset($options));
 			return self::find_by_sql($q->to_sql(), $options);
 		}
 
@@ -276,16 +300,15 @@
 		#Paginator
 
 		public static function paginate($page_num = 1, $options = array()){
-			self::class_name($options);
 			$options = array_merge($options, array(
-				'limit' => self::$options['pagination']['per_page'],
+				'limit'  => self::$options['pagination']['per_page'],
 				'offset' => (($page_num - 1) * self::$options['pagination']['per_page'])
 			));
+			
 			return self::find('all', $options);
 		}
 
 		public static function pages($options = array()){
-			self::class_name($options);
 			$records = self::find('count', $options);
 			return ceil($records/self::$options['pagination']['per_page']);
 		}
@@ -423,8 +446,6 @@
 			return $connection->query($sql);
 		}
 
-		#Connection methods
-
 		/**
 		 * Checks if need fetch all found records, by default is true
 		 * @param Hash $options
@@ -435,22 +456,17 @@
 			return $need_fetch !== false;
 		}
 
+		#Connection methods		
+
 		/**
-		 * Class name handler
-		 * @param Hash $options
-		 * @return String
+		 * Database connection setter/getter
+		 * @param String $connection_name
+		 * @return Object || null
 		 */
-		public static function class_name($options = array()) {			
-			# Get class name from local options
-			$class_name = RaspHash::get($options, 'class');
+		protected static function connection($connection_name, $database_object = null){
+			if (empty($database_object)) return RaspHash::get(self::$connections, $connection_name, null);
 
-			# Then try get cached class name
-			if (empty($class_name)) $class_name = self::$class_name;
-
-			# If class name not cached use RaspActiveRecord
-			if (empty($class_name)) $class_name = __CLASS__;
-
-			return self::$class_name = $class_name;
+			return self::$connections[$connection_name] = $database_object;
 		}
 
 		/**
@@ -459,18 +475,17 @@
 		 * @param Boolean $forcing
 		 * @return Object
 		 */
-		public static function establish_connection($connection_name = null, $forcing = false) {
+		public static function establish_connection($connection_name, $forcing = false) {
 			try {
-				if (empty($connection_name)) $connection_name = self::class_name();
 
 				if (false === self::is_connection_established($connection_name) || $forcing) {
-					# Try get connection params from child class, then from RaspActiveRecord class
-					eval('$connection_params = ' . $connection_name .'::$connection_params;');
-					if (empty($connection_params)) $connection_params = self::$connection_params;
+
+					$connection_params = self::$connection_params;
 					if (empty($connection_params)) throw new RaspActiveRecordException(self::EXCEPTION_MISSED_DATABASE_PARAMS);
 
 					# Establish connection
-					return self::$connections[$connection_name] = new self::$options['database']['driver']($connection_params);
+					$database = new self::$options['database']['driver']($connection_params);
+					return self::connection($connection_name, $database);
 				}			
 
 				return self::connection($connection_name);
@@ -479,44 +494,56 @@
 		}
 
 		/**
-		 * Close connection, if connection name is not assigned used current connection name
+		 * Establish connection by params if local options
+		 * @param Hash $options
+		 * @return Object || false
+		 */
+		protected static function establish_connection_by_options_or_class_name($options) {
+			$class_name = self::class_name($options);
+
+			# If no connection assigned to instance try to open new
+			if (!isset(self::$instances[$class_name]['connection_name'])) {
+				eval('$connection_name = ' . $class_name . '::$connection_name');
+				if (empty($connection_name)) $connection_name = self::$connection_name;
+				if (empty($connection_name)) $connection_name = 'default';
+				self::$instances[$class_name] = array('connection_name' => $connection_name);
+			}
+
+			return self::establish_connection(self::$instances[$class_name]['connection_name']);
+		}
+
+		/**
+		 * Close connection by connection name, if connection not exists throw exception
 		 * @param String $connection_name
 		 * @return Boolean
 		 */
-		public static function close_connection($connection_name = null){
-			$connection = self::connection(empty($connection_name) ? self::class_name() : $connection_name);
+		protected static function close_connection($connection_name){
+			$connection = self::connection($connection_name);
+			if (empty($connection)) throw new RaspActiveRecordException(self::EXCEPTION_CONNECTION_NOT_EXISTS);
 
-			if (!empty($connection) && $connection->close()) {
-				self::$connection[self::class_name()] = null;
-				return true;
-			}
-
-			return false;
+			return $connection->close();
 		}
 
+		/**
+		 * Close all connections
+		 * @return Boolean
+		 */
 		public static function close_all_connections(){
-			foreach (self::$connections as $connection) $connection->close();
+			foreach (self::$connections as $connection) {
+				if (false === $connection->close()) return false;
+			}
 			self::$connections = null;
 			return true;
 		}
 
 		/**
-		 * Check if connection established, if connection name is not assigned used current connection name
+		 * Check if connection established by connection name
 		 * @param String $connection_name
 		 * @return Boolean
 		 */
-		public static function is_connection_established($connection_name = null){
-			$connection = self::connection(empty($connection_name) ? self::class_name() : $connection_name);
+		public static function is_connection_established($connection_name){
+			$connection = self::connection($connection_name);
 			return !empty($connection);
-		}
-
-		/**
-		 * Get database connection object by class name
-		 * @param String $class_name
-		 * @return Object || null
-		 */
-		public static function connection($class_name){
-			return RaspHash::get(self::$connections, $class_name, null);
 		}
 
 		#Validation
@@ -548,22 +575,46 @@
 		#Other methods
 
 		/**
-		 * Get table name
+		 * Gets class name from options and make instance of it
+		 * @TODO check for class existance
+		 * @param Hash $options
+		 * @return String
+		 */
+		public static function class_name($options = array()) {
+			# Checks if class name quick assigned or get it from local options
+			$class_name = is_string($options) ? $options : RaspHash::get($options, 'class');
+
+			# If class name not cached use RaspActiveRecord
+			if (empty($class_name)) $class_name = __CLASS__;
+
+			# Make instance
+			if (!isset(self::$instances[$class_name])) self::$instances[$class_name] = array();
+		
+			return $class_name;
+		}
+
+		/**
+		 * Get table name, if not defined - make and store it
 		 * @return String
 		 */
 		public static function table_name($options = array()) {
 			
-			# Get from local options
+			# Check if table name is assigned via local options
 			$table_name = RaspHash::get($options, 'table');
+			if (!empty($table_name)) return $table_name;
+
 			$class_name = self::class_name($options);
 
-			# Try get from child class property
-			if (empty($table_name)) {
+			# Store table name to cache
+			if (!isset(self::$instances[$class_name]['table_name'])) {
+
 				eval("\$table_name = $class_name::\$table_name;");
+				if (empty($table_name)) $table_name = RaspString::tableize($class_name);
+
+				return self::$instances[$class_name]['table_name'] = $table_name;
 			}
 
-			# Get from class name
-			return empty($table_name) ? RaspString::tableize($class_name) : $table_name;
+			return self::$instances[$class_name]['table_name'];
 		}
 
 		public static function options($option_name){
